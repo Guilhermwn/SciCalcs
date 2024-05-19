@@ -14,7 +14,7 @@ hide_pages(pages_to_hide)
 # CONTEÚDO DA PÁGINA
 menu = option_menu(
     menu_title=None,
-    options=["Home", "Estatisticas"],
+    options=["Home", "Estatísticas"],
     icons=["house-fill", "calculator"],
     orientation="horizontal",
     default_index=1
@@ -114,6 +114,5 @@ with st.container(border=True):
     except ValueError:
         label_inceteza_combinada = 0.0
         st.error("Insira um número válido!!")
-
 
     st.code(body=label_inceteza_combinada)
