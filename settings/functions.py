@@ -1,7 +1,3 @@
-def is_zero(medidas):
-    if sum(medidas) == 0:
-        return True
-
 def media(medidas):
     media = sum(medidas) / len(medidas)
     return media
