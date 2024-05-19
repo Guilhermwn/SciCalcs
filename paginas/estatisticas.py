@@ -34,22 +34,33 @@ values_list = st.text_input(
 
 # VERIFICANDO SE O INPUT ESTÁ VAZIO
 try:
+    # Se o input está vazio
     if values_list == "":
+        float_list = [0,0]
         label_media = 0.0
         label_dp = 0.0
-        label_incertezaA = 0.0        
+        label_incertezaA = 0.0
+    
+    # Se o input recebe algum valor
     else:
+        # Fazendo a criação da lista de valores float
         float_list = [float(value) for value in values_list.split(",")]
-        label_media = func.media(float_list)
-        label_dp = func.desvio_padrao(float_list)
-        label_incertezaA = func.incertezaA(float_list)
+        label_media = f"{func.media(medidas=float_list):.8f}".rstrip('0').rstrip('.')
+        label_dp = f"{func.desvio_padrao(medidas=float_list):.8f}".rstrip('0').rstrip('.')
+        label_incertezaA = f"{func.incertezaA(medidas=float_list):.8f}".rstrip('0').rstrip('.')
+        
+        # Incerteza combinada, inicialmente em 0.0
+
+# caso ocorra algum erro de conversão da lista para float
 except ValueError:
+    float_list = [0,0]
     label_media = 0.0
     label_dp = 0.0
     label_incertezaA = 0.0
+
     top_container = st.container()
     with top_container:
-        st.markdown("""
+        st.error("""
                     Valores inválidos, escreva uma lista de números da seguinte maneira:
                     - Números decimais com ponto: 1.8 ...
                     - Números separados por vírgula: 1,2,1.6 ...
@@ -66,36 +77,26 @@ right_container = right.container(border=True)
 # Ambiente Left
 with left_container:
     st.markdown("<h4 style='text-align: center; color: white;'>Média</h1>", unsafe_allow_html=True)
-    if st.button(label=str(label_media), use_container_width=True, key=1):
-        copy_to_clipboard(label_media)
-        st.toast("Média copiada para a área de transferência!")
+    st.code(body=label_media, line_numbers=False)
 
 # Ambiente Center
 with center_container:
     st.markdown("<h4 style='text-align: center; color: white;'>Desvio Padrão</h1>", unsafe_allow_html=True)
-    if st.button(label=str(label_dp), use_container_width=True, key=2, help="O número de elementos precisa ser maior que 1"):
-        copy_to_clipboard(label_dp)
-        st.toast("Desvio Padrão copiado para a área de transferência!")
+    st.code(body=label_dp, line_numbers=False)
 
 # Ambiente Right
 with right_container:
     st.markdown("<h4 style='text-align: center; color: white;'>Incerteza Tipo A</h1>", unsafe_allow_html=True)
-    if st.button(label=str(label_incertezaA), use_container_width=True, key=3, help="O número de elementos precisa ser maior que 1"):
-        copy_to_clipboard(label_incertezaA)
-        st.toast("Incerteza Tipo A copiada para a área de transferência!")
+    st.code(body=label_incertezaA, line_numbers=False)
 
 # Ambiente Last
 with st.container(border=True):
     st.markdown("<h4 style='text-align: center; color: white;'>Incerteza Combinada</h1>", unsafe_allow_html=True)
+
     last_col1, last_col2 = st.columns(2)
     with last_col1:
-        st.text_input(
-            label=" ",
-            value=str(label_incertezaA), 
-            disabled=True,
-            label_visibility="collapsed"
-        )
-        
+        st.code(body=label_incertezaA, line_numbers=False)
+
     with last_col2:
         inc_inst_value = st.text_input(
             label=" ", 
@@ -103,18 +104,16 @@ with st.container(border=True):
             help="Um único valor19", 
             label_visibility="collapsed"
         )
-        try:
-            if inc_inst_value == "":
-                label_incerteza_combinada = 0.0
-            else:
-                label_incerteza_combinada = func.incerteza_combinada(float_list, float(inc_inst_value))
-        except ValueError:
-                label_incerteza_combinada = 0.0
-                st.markdown("Insira um número válido")
 
-                
+    try:
+        if inc_inst_value == "":
+            label_inceteza_combinada = 0.0
+        else:
+            
+            label_inceteza_combinada = f"{func.incerteza_combinada(float_list, float(inc_inst_value))}"
+    except ValueError:
+        label_inceteza_combinada = 0.0
+        st.error("Insira um número válido!!")
 
-    if st.button(label=str(label_incerteza_combinada), use_container_width=True, key=4, help="O número de elementos precisa ser maior que 1"):
-        copy_to_clipboard(label_incerteza_combinada)
-        st.toast("Incerteza Combinada copiada para a área de transferência!")
 
+    st.code(body=label_inceteza_combinada)
