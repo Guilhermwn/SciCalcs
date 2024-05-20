@@ -116,3 +116,22 @@ with st.container(border=True):
         st.error("Insira um número válido!!")
 
     st.code(body=label_inceteza_combinada)
+
+# EXPLICAÇÕES 
+
+st.divider()
+
+# Explicação da média
+st.markdown(estatisticas_markdown_definitions[0])
+
+# Explicação do Desvio padrão
+st.markdown(estatisticas_markdown_definitions[1])
+
+# Explicação da Incerteza do Tipo A
+st.markdown(estatisticas_markdown_definitions[2])
+
+# Explicação da Incerteza Instrumental
+st.markdown(estatisticas_markdown_definitions[3])
+
+# Explicação da Incerteza Combinada
+st.markdown(estatisticas_markdown_definitions[4])
