@@ -47,7 +47,7 @@ try:
         float_list = [float(value) for value in values_list.split(",")]
         label_media = f"{func.media(medidas=float_list):.8f}".rstrip('0').rstrip('.')
         label_dp = f"{func.desvio_padrao(medidas=float_list):.8f}".rstrip('0').rstrip('.')
-        label_incertezaA = f"{func.incertezaA(medidas=float_list):.8f}".rstrip('0').rstrip('.')
+        label_incertezaA = f"{func.incertezaA(medidas=float_list):.5f}".rstrip('0').rstrip('.')
         
         # Incerteza combinada, inicialmente em 0.0
 
@@ -110,17 +110,46 @@ with st.container(border=True):
             label_inceteza_combinada = 0.0
         else:
             
-            label_inceteza_combinada = f"{func.incerteza_combinada(float_list, float(inc_inst_value))}"
+            label_inceteza_combinada = f"{func.incerteza_combinada(float_list, float(inc_inst_value)):.8f}"
     except ValueError:
         label_inceteza_combinada = 0.0
         st.error("Insira um número válido!!")
 
     st.code(body=label_inceteza_combinada)
 
-# EXPLICAÇÕES 
+
+# FÓRMULAS
+
+with st.expander("Visualização da fórmula da Média"):
+    if contains_invalid_characters(values_list):
+        pass
+    else:
+        if values_list:
+            with st.container(border=True):
+                st.markdown("<h5 style='text-align: center; color: white;'>Média</h1>", unsafe_allow_html=True)
+                st.latex(func.media_latex(values_list))
+with st.expander("Visualização da fórmula do Desvio Padrão"):
+    if contains_invalid_characters(values_list):
+        pass
+    else:
+        if values_list:
+            with st.container(border=True):
+                st.markdown("<h5 style='text-align: center; color: white;'>Desvio Padrão</h1>", unsafe_allow_html=True)
+                st.latex(func.std_dev_latex(values_list, float_list))
+with st.expander("Visualização da fórmula da Incerteza Combinada"):
+    if contains_invalid_characters(values_list):
+        pass
+    else:
+        if float(label_incertezaA)>0:
+            if inc_inst_value:
+                with st.container(border=True):
+                    st.markdown("<h5 style='text-align: center; color: white;'>Incerteza Combinada</h1>", unsafe_allow_html=True)
+                    st.latex(func.combined_uncertainty_latex(label_incertezaA, inc_inst_value))
+
 
 st.divider()
 
+# EXPLICAÇÕES 
 # Explicação da média
 st.markdown(estatisticas_markdown_definitions[0])
 

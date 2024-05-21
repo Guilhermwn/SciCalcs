@@ -1,16 +1,22 @@
+# ------------------------------------------------
 # IMPORTAÇÕES
+
+# Importação de outros módulos
+import re
 
 # Importação Streamlit
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from st_pages import show_pages_from_config, hide_pages
 from streamlit_option_menu import option_menu
-# Importação Streamlit
+import streamlit.components.v1 as components
 
-# Importação de funções internas
+# Importação de módulos internas
 import settings.functions as func
 
+# ------------------------------------------------
 # CONFIGURAÇÕES
+
 # hide_st_styles = """
 # <style>
 # #MainMenu {visibility: hidden;}
@@ -22,8 +28,11 @@ import settings.functions as func
 
 hide_st_styles = ""
 
+# Páginas a esconder na sidebar
 pages_to_hide = ["Home", "Estatisticas"]
 
+# ------------------------------------------------
+# EXPLICAÇÕES USADAS NA PÁGINA "ESTATÍSTICAS"
 estatisticas_markdown_definitions = [
     r"""
     ### Média
@@ -86,3 +95,17 @@ estatisticas_markdown_definitions = [
 
     """
 ]
+
+# ------------------------------------------------
+# FUNÇÕES EXTRAS
+
+# Função para verificar caso haja um caractere errado na string
+def contains_invalid_characters(values_str):
+    # Expressão regular para permitir apenas números, vírgulas e pontos
+    pattern = re.compile(r'^[0-9.,]+$')
+    
+    # Verifica se a string corresponde ao padrão
+    if pattern.match(values_str):
+        return False
+    else:
+        return True
