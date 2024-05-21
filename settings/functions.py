@@ -83,7 +83,7 @@ def std_dev_latex(values_str, medidas):
     
     # Calcula a média dos valores
     # mean = sum(values) / n
-    mean = f"{media(medidas)}".rstrip('0').rstrip('.')
+    mean = f"{media(medidas):.4f}".rstrip('0').rstrip('.')
     
     # Cria a string dos termos individuais (x_i - \overline{x})^2
     terms = [f"({x} - {mean})^2" for x in values]
