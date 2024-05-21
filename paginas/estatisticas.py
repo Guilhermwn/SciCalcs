@@ -1,4 +1,5 @@
 from settings.settings import *
+from settings.settings import contains_invalid_characters
 
 # CONFIGURAÇÕES DA PÁGINA
 st.set_page_config(
