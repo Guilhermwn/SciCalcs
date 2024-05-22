@@ -42,7 +42,7 @@ with center:
         # st.header("Estatística")
         st.image("img/eletric.jpg")
         if st.button("ABRIR", use_container_width=True, key=2):
-            switch_page("Elétricas")
+            switch_page("Eletricas")
 
 
 
