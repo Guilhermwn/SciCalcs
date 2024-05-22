@@ -2,5 +2,4 @@ streamlit
 streamlit_extras
 st_pages
 streamlit_option_menu
-re
 schemdraw
