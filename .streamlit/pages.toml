@@ -1,9 +1,11 @@
 [[pages]]
 path = "main.py"
 name = "Home"
-icon = "🏠"
 
 [[pages]]
 path = "paginas/estatisticas.py"
 name = "Estatisticas"
-icon = ":smile:"
+
+[[pages]]
+path = "paginas/eletrico.py"
+name = "Eletricas"
