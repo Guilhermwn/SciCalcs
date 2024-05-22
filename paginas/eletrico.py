@@ -47,7 +47,7 @@ if option == 'Ganho de amplificador':
     with left:
         r1_container = st.container(border=True, height=190)
         with r1_container:
-            r1 = st.number_input("R1", min_value=0)
+            r1 = st.number_input("R1", min_value=1)
             r1_unit_select = st.selectbox("Unidade R1", ["ohms", "kilohms", "megaohms"], key=1)
             if r1_unit_select == "ohms":
                 r1_calc = r1
