@@ -1,12 +1,16 @@
+import streamlit as st
+
 # ------------------------------------------------
 # FUNÇÕES ESTATÍSTICAS
 
 # MÉDIA
+@st.cache_data
 def media(medidas):
     media = sum(medidas) / len(medidas)
     return media
 
 # DESVIO PADRÃO
+@st.cache_data
 def desvio_padrao(medidas):
     if len(medidas) < 2:
         return False
@@ -21,6 +25,7 @@ def desvio_padrao(medidas):
         return dp
 
 # INCERTEZA ESTATÍSTICA, INCERTEZA TIPO A
+@st.cache_data
 def incertezaA(medidas):
     if len(medidas) < 2:
         return False
@@ -39,6 +44,7 @@ def incertezaA(medidas):
         return incerteza
 
 # INCERTEZA COMBINADA, COMBINAÇÃO DA INCERTEZA ESTATÍSTICA E INSTRUMENTAL
+@st.cache_data
 def incerteza_combinada(medidas, incerteza_b):
     if len(medidas) < 2:
         return False
@@ -63,6 +69,7 @@ def incerteza_combinada(medidas, incerteza_b):
 # FUNÇÕES DE FORMATAÇÃO LATEX
 
 # FORMATAÇÃO DE STRING LATEX DA MÉDIA
+@st.cache_data
 def media_latex(values_str):
     values = values_str.split(',')
     
@@ -77,6 +84,7 @@ def media_latex(values_str):
     return expr
 
 # FORMATAÇÃO DE STRING LATEX DO DESVIO PADRÃO
+@st.cache_data
 def std_dev_latex(values_str, medidas):
     values = list(map(float, values_str.split(',')))
     n = len(values)
@@ -100,6 +108,7 @@ def std_dev_latex(values_str, medidas):
     return expr
 
 # FORMATAÇÃO DE STRING LATEX DA INCERTEZA COMBINADA
+@st.cache_data
 def combined_uncertainty_latex(*uncertainties):
     # Cria a string dos termos individuais (\sigma_{i})^2
     terms = [f"({sigma})^2" for sigma in uncertainties]

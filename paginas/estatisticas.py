@@ -1,5 +1,5 @@
 from settings.settings import *
-from settings.settings import contains_invalid_characters
+# from settings.settings import contains_invalid_characters
 
 # CONFIGURAÇÕES DA PÁGINA
 st.set_page_config(
@@ -10,7 +10,7 @@ st.set_page_config(
 
 st.markdown(hide_st_styles, unsafe_allow_html=True)
 show_pages_from_config()
-hide_pages(pages_to_hide)
+# hide_pages(pages_to_hide)
 
 # CONTEÚDO DA PÁGINA
 menu = option_menu(
@@ -128,7 +128,7 @@ with st.expander("Visualização da fórmula da Média"):
         if values_list:
             with st.container(border=True):
                 st.markdown("<h5 style='text-align: center; color: white;'>Média</h1>", unsafe_allow_html=True)
-                st.latex(func.media_latex(values_list))
+                render_latex(func.media_latex(values_list))
 with st.expander("Visualização da fórmula do Desvio Padrão"):
     if contains_invalid_characters(values_list):
         pass
@@ -136,7 +136,7 @@ with st.expander("Visualização da fórmula do Desvio Padrão"):
         if values_list:
             with st.container(border=True):
                 st.markdown("<h5 style='text-align: center; color: white;'>Desvio Padrão</h1>", unsafe_allow_html=True)
-                st.latex(func.std_dev_latex(values_list, float_list))
+                render_latex(func.std_dev_latex(values_list, float_list))
 with st.expander("Visualização da fórmula da Incerteza Combinada"):
     if contains_invalid_characters(values_list):
         pass
@@ -145,7 +145,7 @@ with st.expander("Visualização da fórmula da Incerteza Combinada"):
             if inc_inst_value:
                 with st.container(border=True):
                     st.markdown("<h5 style='text-align: center; color: white;'>Incerteza Combinada</h1>", unsafe_allow_html=True)
-                    st.latex(func.combined_uncertainty_latex(label_incertezaA, inc_inst_value))
+                    render_latex(func.combined_uncertainty_latex(label_incertezaA, inc_inst_value))
 
 
 st.divider()

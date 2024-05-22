@@ -9,7 +9,7 @@ st.set_page_config(
 
 st.markdown(hide_st_styles, unsafe_allow_html=True)
 show_pages_from_config()
-hide_pages(pages_to_hide)
+# hide_pages(pages_to_hide)
 
 # CONTEÚDO DA PÁGINA
 
@@ -32,8 +32,17 @@ with left:
         st.markdown("<h2 style='text-align: center; color: white;'>Estatística</h1>", unsafe_allow_html=True)
         # st.header("Estatística")
         st.image("img/estatistics.png")
-        if st.button("ABRIR", use_container_width=True):
+        if st.button("ABRIR", use_container_width=True, key=1):
             switch_page("Estatisticas")
+
+with center:
+    center_container = st.container(border=True)
+    with center_container:
+        st.markdown("<h2 style='text-align: center; color: white;'>Elétricas</h1>", unsafe_allow_html=True)
+        # st.header("Estatística")
+        st.image("img/eletric.jpg")
+        if st.button("ABRIR", use_container_width=True, key=2):
+            switch_page("Elétricas")
 
 
 

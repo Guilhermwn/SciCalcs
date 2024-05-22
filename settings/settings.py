@@ -3,6 +3,10 @@
 
 # Importação de outros módulos
 import re
+from io import BytesIO
+import matplotlib.pyplot as plt
+import schemdraw
+import schemdraw.elements as elm
 
 # Importação Streamlit
 import streamlit as st
@@ -24,7 +28,7 @@ import settings.functions as func
 # header {visibility: hidden;}
 # [data-testid="collapsedControl"] {display: none;}
 # </style>
-# """
+#"""
 
 hide_st_styles = ""
 
@@ -109,3 +113,26 @@ def contains_invalid_characters(values_str):
         return False
     else:
         return True
+    
+def render_latex(formula, fontsize=12, dpi=300):
+    """Renders LaTeX formula into Streamlit."""
+    fig = plt.figure()
+    fig.patch.set_alpha(0)  # Define o fundo da figura como transparente
+    text = fig.text(0, 0, f'${formula}$', fontsize=fontsize, color='white')  # Define a cor do texto como branco
+
+    fig.savefig(BytesIO(), dpi=dpi)  # triggers rendering
+
+    bbox = text.get_window_extent()
+    width, height = bbox.size / float(dpi) + 0.05
+    fig.set_size_inches((width, height))
+
+    dy = (bbox.ymin / float(dpi)) / height
+    text.set_position((0, -dy))
+
+    buffer = BytesIO()
+    fig.savefig(buffer, dpi=dpi, format='png', transparent=True)  # Salva a figura com fundo transparente
+    plt.close(fig)
+
+    st.image(buffer)
+
+
