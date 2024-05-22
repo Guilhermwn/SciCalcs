@@ -1,5 +1,5 @@
 from settings.settings import *
-# from settings.settings import contains_invalid_characters
+from settings.settings import contains_invalid_characters, render_latex
 
 # CONFIGURAÇÕES DA PÁGINA
 st.set_page_config(
