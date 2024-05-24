@@ -1,4 +1,6 @@
-from settings.settings import *
+from settings.settings import *        
+from settings.functions import *
+from settings.classes import *
 
 # CONFIGURAÇÕES DA PÁGINA
 st.set_page_config(
@@ -24,25 +26,8 @@ menu = option_menu(
 st.header("Página Inicial")
 st.divider()
 
-left, center, right = st.columns([1,1,1])
-
-with left:
-    left_container = st.container(border=True)
-    with left_container:
-        st.markdown("<h2 style='text-align: center; color: white;'>Estatística</h1>", unsafe_allow_html=True)
-        # st.header("Estatística")
-        st.image("img/estatistics.png")
-        if st.button("ABRIR", use_container_width=True, key=1):
-            switch_page("Estatisticas")
-
-with center:
-    center_container = st.container(border=True)
-    with center_container:
-        st.markdown("<h2 style='text-align: center; color: white;'>Elétricas</h1>", unsafe_allow_html=True)
-        # st.header("Estatística")
-        st.image("img/eletric.jpg")
-        if st.button("ABRIR", use_container_width=True, key=2):
-            switch_page("Eletricas")
+pages_list = Detector("paginas").list_pages()
+grid_creator(pages_list)
 
 
 

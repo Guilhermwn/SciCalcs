@@ -8,4 +8,4 @@ name = "Estatisticas"
 
 [[pages]]
 path = "paginas/eletrico.py"
-name = "Eletricas"
+name = "Eletrico"

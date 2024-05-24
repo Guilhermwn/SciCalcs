@@ -1,5 +1,7 @@
 from settings.settings import *
-from settings.settings import contains_invalid_characters, render_latex
+from settings.functions import *
+from settings.strings import *
+# from settings.functions import contains_invalid_characters, render_latex
 
 # CONFIGURAÇÕES DA PÁGINA
 st.set_page_config(
@@ -46,9 +48,9 @@ try:
     else:
         # Fazendo a criação da lista de valores float
         float_list = [float(value) for value in values_list.split(",")]
-        label_media = f"{func.media(medidas=float_list):.8f}".rstrip('0').rstrip('.')
-        label_dp = f"{func.desvio_padrao(medidas=float_list):.8f}".rstrip('0').rstrip('.')
-        label_incertezaA = f"{func.incertezaA(medidas=float_list):.5f}".rstrip('0').rstrip('.')
+        label_media = f"{media(medidas=float_list):.8f}".rstrip('0').rstrip('.')
+        label_dp = f"{desvio_padrao(medidas=float_list):.8f}".rstrip('0').rstrip('.')
+        label_incertezaA = f"{incertezaA(medidas=float_list):.5f}".rstrip('0').rstrip('.')
         
         # Incerteza combinada, inicialmente em 0.0
 
@@ -111,7 +113,7 @@ with st.container(border=True):
             label_inceteza_combinada = 0.0
         else:
             
-            label_inceteza_combinada = f"{func.incerteza_combinada(float_list, float(inc_inst_value)):.8f}"
+            label_inceteza_combinada = f"{incerteza_combinada(float_list, float(inc_inst_value)):.8f}"
     except ValueError:
         label_inceteza_combinada = 0.0
         st.error("Insira um número válido!!")
@@ -128,7 +130,7 @@ with st.expander("Visualização da fórmula da Média"):
         if values_list:
             with st.container(border=True):
                 st.markdown("<h5 style='text-align: center; color: white;'>Média</h1>", unsafe_allow_html=True)
-                render_latex(func.media_latex(values_list))
+                render_latex(media_latex(values_list))
 with st.expander("Visualização da fórmula do Desvio Padrão"):
     if contains_invalid_characters(values_list):
         pass
@@ -136,7 +138,7 @@ with st.expander("Visualização da fórmula do Desvio Padrão"):
         if values_list:
             with st.container(border=True):
                 st.markdown("<h5 style='text-align: center; color: white;'>Desvio Padrão</h1>", unsafe_allow_html=True)
-                render_latex(func.std_dev_latex(values_list, float_list))
+                render_latex(std_dev_latex(values_list, float_list))
 with st.expander("Visualização da fórmula da Incerteza Combinada"):
     if contains_invalid_characters(values_list):
         pass
@@ -145,7 +147,7 @@ with st.expander("Visualização da fórmula da Incerteza Combinada"):
             if inc_inst_value:
                 with st.container(border=True):
                     st.markdown("<h5 style='text-align: center; color: white;'>Incerteza Combinada</h1>", unsafe_allow_html=True)
-                    render_latex(func.combined_uncertainty_latex(label_incertezaA, inc_inst_value))
+                    render_latex(inc_comb_latex(label_incertezaA, inc_inst_value))
 
 
 st.divider()

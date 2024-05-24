@@ -1,16 +1,90 @@
+# ------------------------------------------------
+# IMPORTAÇÕES
+
+# Importação de outros módulos
+import re
+import os
+import schemdraw
+from io import BytesIO
+from pathlib import Path
+import matplotlib.pyplot as plt
+import schemdraw.elements as elm
+from decimal import Decimal, getcontext
+
+# IMPORTAÇÕES STREAMLIT
 import streamlit as st
+from streamlit_extras.switch_page_button import switch_page
+
+# ------------------------------------------------
+# FUNÇÕES STREAMLIT
+
+# CRIAÇÃO DA GRID DE PÁGINAS DA PÁGINA INICIAL
+def grid_creator(pages):
+
+    # CRIAÇÃO DAS COLUNAS
+    l1, c1, r1 = st.columns(3)
+
+    # COLUNAS REUNIDAS
+    cols = [l1, c1, r1]
+
+    # QUANTIDADE DE PÁGINAS
+    pages_amount = len(pages)
+    
+    # VETOR DE POSIÇÕES
+    pos = [0,1,2]
+
+    # VETOR FIXO DE ATUALIZAÇÃO
+    updater  = [3,3,3]
+    
+    # ELE SABE A QUANTIDADE DE PÁGINAS QUE TEM
+    for i in range(pages_amount):
+        # CASO A POSIÇÃO SEJA MAIOR QUE O ÚLTIMO NÚMERO DA SEQUÊNCIA DE POSIÇÕES ATUAIS
+        if i > pos[-1]:
+            pos = [pos[j]+updater[j] for j in range(3)]
+        
+        # SE O INDICE DA PAGINA ATUAL É IGUAL À POSIÇÃO DESIGNADA
+        if pages.index(pages[i]) == pos[0]:
+            
+            # NA COLUNA ESQUERDA
+            with cols[0]:
+                with st.container(border=True):
+                    st.markdown(f"<h2 style='text-align: center; color: white;'>{pages[i]}</h1>", unsafe_allow_html=True)
+                    st.image("img/" + f"{pages[i]}" + ".png")
+                    if st.button("ABRIR", use_container_width=True, key=pages[i]):
+                        switch_page(pages[i])
+
+        # SE O INDICE DA PAGINA ATUAL É IGUAL À POSIÇÃO DESIGNADA
+        if pages.index(pages[i]) == pos[1]:
+            
+            # NA COLUNA DO MEIO
+            with cols[1]:
+                with st.container(border=True):
+                    st.markdown(f"<h2 style='text-align: center; color: white;'>{pages[i]}</h1>", unsafe_allow_html=True)
+                    st.image("img/" + f"{pages[i]}" + ".png")
+                    if st.button("ABRIR", use_container_width=True, key=pages[i]):
+                        switch_page(pages[i])
+
+        # SE O INDICE DA PAGINA ATUAL É IGUAL À POSIÇÃO DESIGNADA
+        if pages.index(pages[i]) == pos[2]:
+            
+            # NA COLUNA DA ESQUERDA
+            with cols[2]:
+                with st.container(border=True):
+                    st.markdown(f"<h2 style='text-align: center; color: white;'>{pages[i]}</h1>", unsafe_allow_html=True)
+                    st.image("img/" + f"{pages[i]}" + ".png")
+                    if st.button("ABRIR", use_container_width=True, key=pages[i]):
+                        switch_page(pages[i])
+
 
 # ------------------------------------------------
 # FUNÇÕES ESTATÍSTICAS
 
 # MÉDIA
-@st.cache_data
 def media(medidas):
     media = sum(medidas) / len(medidas)
     return media
 
 # DESVIO PADRÃO
-@st.cache_data
 def desvio_padrao(medidas):
     if len(medidas) < 2:
         return False
@@ -25,7 +99,6 @@ def desvio_padrao(medidas):
         return dp
 
 # INCERTEZA ESTATÍSTICA, INCERTEZA TIPO A
-@st.cache_data
 def incertezaA(medidas):
     if len(medidas) < 2:
         return False
@@ -44,7 +117,6 @@ def incertezaA(medidas):
         return incerteza
 
 # INCERTEZA COMBINADA, COMBINAÇÃO DA INCERTEZA ESTATÍSTICA E INSTRUMENTAL
-@st.cache_data
 def incerteza_combinada(medidas, incerteza_b):
     if len(medidas) < 2:
         return False
@@ -63,13 +135,24 @@ def incerteza_combinada(medidas, incerteza_b):
 
         combinada = ( (incerteza_a ** 2) + (incerteza_b ** 2) ) ** 0.5
         return combinada
-# FUNÇÕES ESTATÍSTICAS
+
+# ------------------------------------------------
+
+# VERIFICADOR DE STRING
+def contains_invalid_characters(values_str):
+    # Expressão regular para permitir apenas números, vírgulas e pontos
+    pattern = re.compile(r'^[0-9.,]+$')
+    
+    # Verifica se a string corresponde ao padrão
+    if pattern.match(values_str):
+        return False
+    else:
+        return True
 
 # ------------------------------------------------
 # FUNÇÕES DE FORMATAÇÃO LATEX
 
 # FORMATAÇÃO DE STRING LATEX DA MÉDIA
-@st.cache_data
 def media_latex(values_str):
     values = values_str.split(',')
     
@@ -84,7 +167,6 @@ def media_latex(values_str):
     return expr
 
 # FORMATAÇÃO DE STRING LATEX DO DESVIO PADRÃO
-@st.cache_data
 def std_dev_latex(values_str, medidas):
     values = list(map(float, values_str.split(',')))
     n = len(values)
@@ -108,8 +190,7 @@ def std_dev_latex(values_str, medidas):
     return expr
 
 # FORMATAÇÃO DE STRING LATEX DA INCERTEZA COMBINADA
-@st.cache_data
-def combined_uncertainty_latex(*uncertainties):
+def inc_comb_latex(*uncertainties):
     # Cria a string dos termos individuais (\sigma_{i})^2
     terms = [f"({sigma})^2" for sigma in uncertainties]
     
@@ -123,3 +204,51 @@ def combined_uncertainty_latex(*uncertainties):
     # Cria a expressão final em LaTeX
     expr = f"\\sigma_{{c}} = \\sqrt{{{terms_adjusted}}}"
     return expr
+
+# RENDERIZAÇÃO DE LATEX EM IMAGEM
+def render_latex(formula, fontsize=12, dpi=300):
+    """Renders LaTeX formula into Streamlit."""
+    fig = plt.figure()
+    fig.patch.set_alpha(0)  # Define o fundo da figura como transparente
+    text = fig.text(0, 0, f'${formula}$', fontsize=fontsize, color='white')  # Define a cor do texto como branco
+
+    fig.savefig(BytesIO(), dpi=dpi)  # triggers rendering
+
+    bbox = text.get_window_extent()
+    width, height = bbox.size / float(dpi) + 0.05
+    fig.set_size_inches((width, height))
+
+    dy = (bbox.ymin / float(dpi)) / height
+    text.set_position((0, -dy))
+
+    buffer = BytesIO()
+    fig.savefig(buffer, dpi=dpi, format='png', transparent=True)  # Salva a figura com fundo transparente
+    plt.close(fig)
+
+    st.image(buffer)
+
+# ------------------------------------------------
+
+# FUNÇÃO QUE RETORNA COMBINAÇÕES DE RESISTORES QUE ATINGEM O GANHO INSERIDO
+def recommended_resistors(gain: int, precision: int):
+    getcontext().prec = 10  # Definir precisão alta para evitar problemas de ponto flutuante
+    resistors = []
+    tolerance = precision/100  # Definir uma margem de tolerância (1%)
+
+    e12_base_values = [Decimal('1.0'), Decimal('1.2'), Decimal('1.5'), Decimal('1.8'),
+                       Decimal('2.2'), Decimal('2.7'), Decimal('3.3'), Decimal('3.9'),
+                       Decimal('4.7'), Decimal('5.6'), Decimal('6.8'), Decimal('8.2')]
+    # Gerar lista de valores comerciais para resistores com alta precisão
+    resistor_values = [value * (Decimal(10) ** exp) for exp in range(-2, 7) for value in e12_base_values]
+
+    for r1 in resistor_values:
+        for r2 in resistor_values:
+            # Verificar se os resistores estão dentro da faixa desejada
+            if r1 > Decimal('9') and r1 < Decimal('1000000') and r2 > Decimal('9') and r2 < Decimal('1000000'):
+                if abs((r2 / r1) - gain) <= tolerance:
+                    resistors.append([r1, r2])
+    
+    # Ordenar os resistores pela soma dos seus valores, como uma forma de organização
+    resistors.sort(key=lambda x: x[0] + x[1])
+    return resistors
+
