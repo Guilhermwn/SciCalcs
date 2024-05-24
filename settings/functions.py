@@ -49,7 +49,7 @@ def grid_creator(pages):
             with cols[0]:
                 with st.container(border=True):
                     st.markdown(f"<h2 style='text-align: center; color: white;'>{pages[i]}</h1>", unsafe_allow_html=True)
-                    st.image("img/" + f"{pages[i]}" + ".png")
+                    st.image(f"img/{pages[i]}.png")
                     if st.button("ABRIR", use_container_width=True, key=pages[i]):
                         switch_page(pages[i])
 
