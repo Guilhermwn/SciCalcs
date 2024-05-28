@@ -28,6 +28,3 @@ st.divider()
 
 pages_list = Detector("paginas").list_pages()
 grid_creator(pages_list)
-
-
-

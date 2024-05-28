@@ -44,90 +44,106 @@ st.divider()
 
 # SELETOR
 if option == 'Ganho de amplificador':
-    st.title("Amplificador Inversor")
+    tipo_amplificador = st.selectbox(
+        "Escolha qual tipo:",
+        options=["Amplificador Inversor[R1,R2]",
+                "Amplificador Inversor[G]"],
+        index=0,
+        label_visibility="collapsed"
+    )
 
-    # COLUNAS DE INSERÇÃO DE DADOS
-    left, center, right = st.columns(3)
-    
-    # ==============================================================
-    # SETOR DE INPUT DO RESISTOR 2
+    if tipo_amplificador == "Amplificador Inversor[R1,R2]":
+        st.title("Amplificador Inversor")
+        st.write("Insira os valores de resistores e o ganho resultante será exibido.")
 
-    with left:
-        r1_container = st.container(border=True, height=190)
-        with r1_container:
-            # INPUT DO VALOR DO RESISTOR 1
-            r1 = st.number_input("R1", min_value=1)
+        with st.form("Inversor via Rs",clear_on_submit=True):
+            left, center= st.columns(2)
 
-            # INPUT DA UNIDADE DO RESISTOR 1
-            r1_unit_select = st.selectbox("Unidade R1", ["ohms", "kilohms", "megaohms"], key=1)
-
-            # FORMATAÇÃO DA UNIDADE NUMÉRICA PARA CÁLCULO E UNIDADE TEXTUAL PARA VISUALIZAÇÃO 
-            if r1_unit_select == "ohms":
-                r1_calc = r1
-                r1_unit = "\Omega"
-            if r1_unit_select == "kilohms":
-                r1_calc = r1*1000
-                r1_unit = "K\Omega"
-            if r1_unit_select == "megaohms":
-                r1_calc = r1*1000000
-                r1_unit = "M\Omega"
-
-    # ==============================================================
-    # SETOR DE INPUT DO RESISTOR 2
-
-    with center:
-        r2_container = st.container(border=True, height=190)
-        with r2_container:
-            # INPUT DO VALOR DO RESISTOR 2
-            r2 = st.number_input("R2", min_value=0)
-
-            # INPUT DA UNIDADE DO RESISTOR 2
-            r2_unit_select = st.selectbox("Unidade R2", ["ohms", "kilohms", "megaohms"], key=2)
+            # ==============================================================
+            # SETOR DE INPUT DO RESISTOR 2
             
-            # FORMATAÇÃO DA UNIDADE NUMÉRICA PARA CÁLCULO E UNIDADE TEXTUAL PARA VISUALIZAÇÃO 
-            if r2_unit_select == "ohms":
-                r2_calc = r2
-                r2_unit = "\Omega"
-            if r2_unit_select == "kilohms":
-                r2_calc = r2*1000
-                r2_unit = "K\Omega"
-            if r2_unit_select == "megaohms":
-                r2_calc = r2*1000000
-                r2_unit = "M\Omega"
-    
-    # ==============================================================
-    # SETOR DE EXIBIÇÃO DO GANHO
+            with left:
+                with st.container(border=True):
+                    r1_value = st.number_input("Valor do Resistor 1", min_value=1,key="r1_value")
+                    r1_unit = st.selectbox("Unidade do Resistor 1",["ohms", "kilohms","megaohms"], key="r1_unit")
+                    if r1_unit == "ohms":
+                        r1 = r1_value
+                        r1_latex = "\Omega"
+                    if r1_unit == "kilohms":
+                        r1 = r1_value * 1000
+                        r1_latex = "K\Omega"
+                    if r1_unit == "megaohms":
+                        r1 = r1_value * 1000 * 1000
+                        r1_latex = "M\Omega"
 
-    with right:
-        ganho_container = st.container(border=True, height=190)
-        with ganho_container:
-            # CÁLCULO DO GANHO 
-            ganho = -(r2_calc/r1_calc)
-            st.markdown(f"<h3 style='text-align: center; color: white;'>Ganho</h1>", unsafe_allow_html=True)
-            st.number_input("ganho", value=ganho,label_visibility="collapsed")
-            # st.metric("Ganho do amplificador", value=ganho)
+            # ==============================================================
+            # SETOR DE INPUT DO RESISTOR 2
 
-    # ==============================================================
-    # EXIBIÇÃO DA IMAGEM DO CIRCUITO
+            with center:
+                with st.container(border=True):
+                    r2_value = st.number_input("Valor do Resistor 1", min_value=0,key="r2_value")
+                    r2_unit = st.selectbox("Unidade do Resistor 1",["ohms", "kilohms","megaohms"], key="r2_unit")
+                    if r2_unit == "ohms":
+                        r2 = r2_value
+                        r2_latex = "\Omega"
+                    if r2_unit == "kilohms":
+                        r2 = r2_value * 1000
+                        r2_latex = "K\Omega"
+                    if r2_unit == "megaohms":
+                        r2 = r2_value * 1000 * 1000
+                        r2_latex = "M\Omega"
+            
+            # ==============================================================
+            # BOTÃO DE CONFIRMAÇÃO
 
-    # FORMATAÇÃO DAS LABELS DOS RESISTORES
-    r1_label = f"{r1}" + f"{r1_unit}"
-    r2_label = f"{r2}" + f"{r2_unit}"
+            st.form_submit_button(use_container_width=True)
+                
+                        
+        # ==============================================================
 
-    # == DESENHO DO AMPLIFICADOR ==
-    schemdraw.config(bgcolor='#0e1117')
-    schemdraw.config(color='white')
-    with schemdraw.Drawing(show=False,) as d:
-        op = elm.Opamp(leads=True)
-        elm.Line().down(d.unit/4).at(op.in2)
-        elm.Ground(lead=False)
-        Rin = elm.Resistor().at(op.in1).left().idot().label(f'${r1_label}$', loc='bot').label('$v_{in}$', loc='left')
-        elm.Line().up(d.unit/2).at(op.in1)
-        elm.Resistor().tox(op.out).label(f'${r2_label}$')
-        elm.Line().toy(op.out).dot()
-        elm.Line().right(d.unit/4).at(op.out).label('$v_{o}$', loc='right')
+        
+        g_value = - (r2/r1)
+        show_l, show_c, show_r = st.columns(3)
+        with show_l:
+            st.metric("Resistor 1",f"{r1_value} {r1_unit}")
+        with show_c:
+            st.metric("Resistor 2",f"{r2_value} {r2_unit}")
+        with show_r:
+            st.metric("Ganho",f"{g_value:.2f}")
 
-    image_bytes = d.get_imagedata('png')
-    st.image(image_bytes)
-    # == DESENHO DO AMPLIFICADOR ==
+        # EXIBIÇÃO DA IMAGEM DO CIRCUITO
 
+        # FORMATAÇÃO DAS LABELS DOS RESISTORES
+        r1_label = f"{r1_value} {r1_latex}"
+        r2_label = f"{r2_value} {r2_latex}"
+
+        # == DESENHO DO AMPLIFICADOR ==
+        amp_drawing = amp_inversor_draw(r1_label, r2_label, 'white','#0e1117')
+        st.image(amp_drawing)
+        # == DESENHO DO AMPLIFICADOR ==
+    if tipo_amplificador == "Amplificador Inversor[G]":
+        st.title("Amplificador Inversor")
+        st.write("Insira um valor de ganho desejado, e será exibido as combinações de resistores compatíveis.")
+
+        with st.form("Inversor via G"):
+            gain_value = st.number_input("Valor do Ganho", value=0, key="g_val")
+            precision_value = st.number_input("Tolerância de Resultados", 
+                                              value=20,
+                                              min_value=0, 
+                                              max_value=100,
+                                              help="Quanto menor o valor, mais próximo da combinação perfeita",
+                                              key="calc_precision")
+            st.form_submit_button("Calcular", use_container_width=True)
+
+        calculated_resistors = recommended_resistors(gain_value, precision_value)
+        resistors_df = pd.DataFrame(calculated_resistors, columns=['R1', 'R2'])
+        
+        r1 = f"{resistors_df['R1'][0]} \Omega"
+        r2 = f"{resistors_df['R2'][0]} \Omega"
+        st.image(amp_inversor_draw(r1,r2))
+        
+        table_space = st.empty()
+        if gain_value == 0:
+            table_space.empty()
+        else:
+            table_space.dataframe(resistors_df, use_container_width=True)

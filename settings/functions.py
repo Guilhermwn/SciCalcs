@@ -10,6 +10,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import schemdraw.elements as elm
 from decimal import Decimal, getcontext
+import pandas as pd
 
 # IMPORTAÇÕES STREAMLIT
 import streamlit as st
@@ -227,6 +228,22 @@ def render_latex(formula, fontsize=12, dpi=300):
 
     st.image(buffer)
 
+def amp_inversor_draw(r1_label: str, r2_label: str, line_color: str='white',bg_color: str='#0e1117'):
+    schemdraw.config(bgcolor=bg_color)
+    schemdraw.config(color=line_color)
+    with schemdraw.Drawing(show=False,) as d:
+        op = elm.Opamp(leads=True)
+        elm.Line().down(d.unit/4).at(op.in2)
+        elm.Ground(lead=False)
+        Rin = elm.Resistor().at(op.in1).left().idot().label(f'${r1_label}$', loc='bot').label('$v_{in}$', loc='left')
+        elm.Line().up(d.unit/2).at(op.in1)
+        elm.Resistor().tox(op.out).label(f'${r2_label}$')
+        elm.Line().toy(op.out).dot()
+        elm.Line().right(d.unit/4).at(op.out).label('$v_{o}$', loc='right')
+
+    image_bytes = d.get_imagedata('png')
+    return image_bytes
+
 # ------------------------------------------------
 
 # FUNÇÃO QUE RETORNA COMBINAÇÕES DE RESISTORES QUE ATINGEM O GANHO INSERIDO
@@ -251,4 +268,3 @@ def recommended_resistors(gain: int, precision: int):
     # Ordenar os resistores pela soma dos seus valores, como uma forma de organização
     resistors.sort(key=lambda x: x[0] + x[1])
     return resistors
-
