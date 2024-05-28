@@ -9,3 +9,7 @@ name = "Estatisticas"
 [[pages]]
 path = "paginas/eletrico.py"
 name = "Eletrico"
+
+[[pages]]
+path = "paginas/sobre.py"
+name = "Sobre"

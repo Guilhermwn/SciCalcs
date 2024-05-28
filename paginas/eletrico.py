@@ -4,7 +4,7 @@ from settings.functions import *
 
 # CONFIGURAÇÕES DA PÁGINA
 st.set_page_config(
-    page_title="SciCalcs - Estatísticas",
+    page_title="SciCalcs - Elétrico",
     initial_sidebar_state="collapsed",
     layout="centered"
 )
