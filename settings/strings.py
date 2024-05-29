@@ -63,3 +63,57 @@ estatisticas_markdown_definitions = [
 
     """
 ]
+
+eletrico_amplifier_strings = [
+    r"""
+    ### Explicação
+    Um amplificador operacional (amp op) inversor é um circuito amplificador que utiliza um amplificador operacional para amplificar um sinal de entrada com inversão de fase. Isso significa que a saída é um sinal amplificado que é 180 graus fora de fase em relação ao sinal de entrada. A configuração básica inclui um resistor de entrada ($R_{\text{in}}$) e um resistor de realimentação ($R_f$) conectados ao amplificador operacional.
+
+    ### Funcionamento
+    1. **Entrada de Sinal (Vin):** O sinal de entrada é aplicado ao terminal inversor ($V_{-}$) do amplificador operacional através do resistor de entrada ($R_{\text{in}}$). O terminal não inversor ($V_{+}$) é geralmente conectado ao terra (0V).
+    2. **Realimentação:** O resistor de realimentação ($R_f$) é conectado entre a saída do amplificador operacional e o terminal inversor ($V_{-}$). Esse resistor fornece uma realimentação negativa ao circuito.
+    3. **Amplificação:** O amplificador operacional ajusta a saída ($V_{\text{out}}$) para manter a tensão no terminal inversor ($V_{-}$) igual à do terminal não inversor ($V_{+}$), que está em 0V (terra). Devido à alta impedância de entrada e ao ganho infinito ideal do amplificador operacional, a corrente que entra no terminal inversor é desprezível, fazendo com que a corrente através de $R_{\text{in}}$ seja igual à corrente através de $R_f$.
+
+    ### Fórmula
+    A relação entre a tensão de entrada ($V_{\text{in}}$) e a tensão de saída ($V_{\text{out}}$) é dada pela fórmula do ganho do amplificador inversor:
+    
+    $$ V_{\text{out}} = -\left(\frac{R_f}{R_{\text{in}}}\right) V_{\text{in}} $$
+
+    ### Explicação da Fórmula
+    - **Ganho ($-\frac{R_f}{R_{\text{in}}}$):** O ganho do amplificador inversor é determinado pela razão entre o resistor de realimentação ($R_f$) e o resistor de entrada ($R_{\text{in}}$). O sinal negativo indica que a saída está em fase oposta à entrada (inversão de fase).
+    - **Corrente:** A corrente que flui através de $R_{\text{in}}$ (devido a $V_{\text{in}}$) é a mesma que flui através de $R_f$ (devido a $V_{\text{out}}$) porque a corrente de entrada do amplificador operacional é praticamente zero.
+    - **Realimentação Negativa:** O amplificador operacional ajusta sua saída para manter o terminal inversor em um potencial próximo ao terra (0V), garantindo que a tensão de entrada seja proporcionalmente amplificada e invertida.
+
+    ### Exemplo Prático
+    Se você deseja um ganho de 50, você precisa escolher $R_f$ e $R_{\text{in}}$ de forma que:
+    
+    $$ 50 = \frac{R_f}{R_{\text{in}}} $$
+
+    Por exemplo, se $R_{\text{in}}$ é 1kΩ, então $R_f$ deve ser 50kΩ para obter o ganho desejado de -50.
+    """,
+    r"""
+    ### Explicação
+    Um amplificador operacional (amp op) não inversor é um circuito que amplifica um sinal de entrada sem inverter sua fase. A configuração básica inclui dois resistores ($R_1$ e $R_f$) e um amplificador operacional.
+
+    ### Funcionamento
+    1. **Entrada de Sinal (Vin):** O sinal de entrada é aplicado ao terminal não inversor ($V_{+}$) do amplificador operacional.
+    2. **Realimentação:** O resistor $R_f$ é conectado entre a saída ($V_{\text{out}}$) e o terminal inversor ($V_{-}$), e o resistor $R_1$ é conectado entre o terminal inversor ($V_{-}$) e o terra.
+    3. **Amplificação:** O amplificador operacional ajusta a saída para manter $V_{-}$ igual a $V_{+}$.
+
+    ### Fórmula
+    A relação entre a tensão de entrada ($V_{\text{in}}$) e a tensão de saída ($V_{\text{out}}$) é dada pela fórmula do ganho do amplificador não inversor:
+
+    $$ V_{\text{out}} = \left(1 + \frac{R_f}{R_1}\right) V_{\text{in}} $$
+
+    ### Explicação da Fórmula
+    - **Ganho ($1 + \frac{R_f}{R_1}$):** O ganho do amplificador não inversor é determinado pela razão entre $R_f$ e $R_1$, mais 1.
+    - **Realimentação Negativa:** O amplificador operacional ajusta a saída para manter $V_{-}$ igual a $V_{+}$, resultando em uma amplificação proporcional sem inversão de fase.
+
+    ### Exemplo Prático
+    Se você deseja um ganho de 11, você pode escolher $R_f$ como 10kΩ e $R_1$ como 1kΩ:
+
+    $$ 11 = 1 + \frac{10kΩ}{1kΩ} $$
+
+    Assim, o sinal de entrada é amplificado 11 vezes sem inversão de fase.
+    """
+]

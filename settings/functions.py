@@ -244,10 +244,28 @@ def amp_inversor_draw(r1_label: str, r2_label: str, line_color: str='white',bg_c
     image_bytes = d.get_imagedata('png')
     return image_bytes
 
+def amp_non_inversor_draw(r1_label: str, r2_label: str, line_color: str='white',bg_color: str='#0e1117'):
+    schemdraw.config(bgcolor=bg_color)
+    schemdraw.config(color=line_color)
+    with schemdraw.Drawing() as d:
+        op = elm.Opamp(leads=True)
+        out = elm.Line().at(op.out).length(.75)
+        elm.Line().up().at(op.in1).length(1.5).dot()
+        d.push()
+        elm.Resistor().left().label(f'${r1_label}$')
+        elm.Ground()
+        d.pop()
+        elm.Resistor().tox(op.out).label(f'${r2_label}$')
+        elm.Line().toy(op.out).dot()
+        elm.Line().left(d.unit/4).at(op.in2).label('$v_{in}$', loc='left')
+    
+    image_bytes = d.get_imagedata('png')
+    return image_bytes
+
 # ------------------------------------------------
 
 # FUNÇÃO QUE RETORNA COMBINAÇÕES DE RESISTORES QUE ATINGEM O GANHO INSERIDO
-def recommended_resistors(gain: int, precision: int):
+def inv_r_combination(gain: int, precision: int):
     getcontext().prec = 10  # Definir precisão alta para evitar problemas de ponto flutuante
     resistors = []
     tolerance = precision/100  # Definir uma margem de tolerância (1%)
