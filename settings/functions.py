@@ -150,6 +150,12 @@ def contains_invalid_characters(values_str):
     else:
         return True
 
+def validar_string_numerica(s):
+    # Define a regex para validar a string
+    padrao = re.compile(r'^(-?\d+(\.\d+)?)(,\s*-?\d+(\.\d+)?)*$')
+    # Verifica se a string bate com o padrão
+    return bool(padrao.match(s))
+
 # ------------------------------------------------
 # FUNÇÕES DE FORMATAÇÃO LATEX
 
