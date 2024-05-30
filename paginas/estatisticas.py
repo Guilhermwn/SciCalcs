@@ -179,6 +179,10 @@ if option == "Incertezas Associadas":
     # Explicação da Incerteza Combinada
     st.markdown(estatisticas_markdown_definitions[4])
 
+
+# =====================================================
+# PÁGINA DE GERAÇÃO DE GRÁFICOS
+
 if option == "Geração de Gráficos":
 
     color_map = {
@@ -199,31 +203,75 @@ if option == "Geração de Gráficos":
         "Tracejada + Ponto": "-.",
         "Pontuada": ":"
     }
+    markers_style_map = {
+        "Padrão": "o",
+        "Ponto": ".",
+        "Triângulo": "^",
+        "Tri": "2",
+        "Quadrado" : "s",
+        "Mais": "P",
+        "Estrela": "*",
+    }
 
     st.title("Geração de Gráficos")
 
+    graph_type = st.selectbox("Tipo de gráfico",["Linha","Dispersão"])
+    
     # =====================================================
-    # FORMULÁRIO DE CRIAÇÃO DO GRÁFICO
+    # TIPOS DE GRÁFICO SELECIONADOS
 
-    with st.form("Chart Generator"):
-        st.write("Insira os valores dos eixos **X** e **Y** e o tipo de gráfico nos campos abaixo:")
-        
-        x_axes = st.text_area("Valores do Eixo X")
-        y_axes = st.text_area("Valores do Eixo Y")
-        graph_type = st.selectbox("Tipo de gráfico",["Linha","Dispersão"])
-        
-        with st.expander("Customizações", expanded=False):
-            title_graph = st.text_input("Título do Gráfico")
-            title_x_axis = st.text_input("Título do eixo X")
-            title_y_axis = st.text_input("Título do eixo Y")
+    # =====================================================
+    # GRÁFICO DE LINHA
+    if graph_type == "Linha":
+
+        # FORMULÁRIO DE GERAÇÃO
+        with st.form("Line Chart Generator"):
+            st.write("Insira os valores dos eixos **X** e **Y**:")
             
-            if graph_type == "Linha":
+            # DEFINIÇÃO DOS VALORES DOS EIXOS
+            x_axes = st.text_area("Valores do Eixo X")
+            y_axes = st.text_area("Valores do Eixo Y")
+            
+            # CUSTOMIZAÇÕES
+            with st.expander("Customizações", expanded=False):
+                title_graph = st.text_input("Título do Gráfico")
+                title_x_axis = st.text_input("Título do eixo X")
+                title_y_axis = st.text_input("Título do eixo Y")
+                
                 line_color = st.selectbox("Cor da linha",list(color_map.keys()))
                 line_style_set = st.selectbox("Estilo da Linha", list(line_style_map.keys()))
-            elif graph_type == "Dispersão":
+                
+                graph_theme = st.selectbox("Tema do Gráfico", index=5,options=plt.style.available)
+            
+            # BOTÃO DE GERAÇÃO
+            st.form_submit_button("Gerar", use_container_width=True)
+
+    # =====================================================
+    # GRÁFICO DE DISPERSÃO
+    if graph_type == "Dispersão":
+
+        # FORMULÁRIO DE GERAÇÃO
+        with st.form("Scatter Chart Generator"):
+            st.write("Insira os valores dos eixos **X** e **Y**:")
+            
+            # DEFINIÇÃO DOS VALORES DE DOS EIXOS
+            x_axes = st.text_area("Valores do Eixo X")
+            y_axes = st.text_area("Valores do Eixo Y")
+            
+            # CUSTOMIZAÇÕES
+            with st.expander("Customizações", expanded=False):
+                title_graph = st.text_input("Título do Gráfico")
+                title_x_axis = st.text_input("Título do eixo X")
+                title_y_axis = st.text_input("Título do eixo Y")
+                
                 dot_color = st.selectbox("Cor dos pontos",list(color_map.keys()))
+                markers_style_set = st.selectbox("Estilo de marcadores", list(markers_style_map.keys()))
+
+                graph_theme = st.selectbox("Tema do Gráfico", index=5,options=plt.style.available)
+            
+            # BOTÃO DE GERAÇÃO
+            st.form_submit_button("Gerar", use_container_width=True)
         
-        st.form_submit_button("Gerar", use_container_width=True)
        
     # =====================================================
     # GERAÇÃO DO GRÁFICO COM BASE NAS INFORMAÇÕES DO FORMULÁRIO
@@ -237,22 +285,65 @@ if option == "Geração de Gráficos":
         y_nums = [0]
 
     # PLOT DO GRÁFICO
+    plt.style.use(graph_theme)
     fig, ax = plt.subplots()
+
+    # CASO GRÁFICO SELECIONADO FOR UM GRÁFICO DE LINHA
     if graph_type == "Linha":
         ax.plot(x_nums,
                 y_nums,
-                'o-',
                 color=color_map[line_color],
                 linestyle=line_style_map[line_style_set],)
-        ax.set(xlabel=title_x_axis, 
-               ylabel=title_y_axis,
-               title=title_graph,)
+
+        font_size = 20
+        ax.set_xlabel(title_x_axis, fontsize=font_size)
+        ax.set_ylabel(title_y_axis, fontsize=font_size)
+        ax.set_title(title_graph, fontsize=font_size)
+
     
+    ## CASO GRÁFICO SELECIONADO FOR UM GRÁFICO DE DISPERSÃO
     elif graph_type == "Dispersão":    
         ax.scatter(
             x_nums,
             y_nums,
             color=color_map[dot_color],
-        )
+            marker=markers_style_map[markers_style_set])
+        
+        font_size = 14
+        ax.set_xlabel(title_x_axis, fontsize=font_size)
+        ax.set_ylabel(title_y_axis, fontsize=font_size)
+        ax.set_title(title_graph, fontsize=font_size)
 
-    st.pyplot(fig)
+    
+    # EXIBIÇÃO DO GRÁFICO
+    with st.container(border=True):
+        st.pyplot(fig)
+        plot_generated_pdf = BytesIO()
+        plot_generated_jpg = BytesIO()
+        
+        # GERAÇÃO DO NOME DO ARQUIVO
+        if title_graph == "":
+            file_name = [f"graph_scicalcs.pdf",f"graph_scicalcs.jpg"]
+        else:
+            file_name = [f"{title_graph}.pdf", f"{title_graph}.jpg"]
+        
+        plt.savefig(plot_generated_pdf, dpi=300,format='pdf')
+        plt.savefig(plot_generated_jpg, dpi=300,format='jpg')
+
+        donwload_slot_l, donwload_slot_r = st.columns(2)
+        with donwload_slot_l:
+            st.download_button(
+                label="Baixar Gráfico PDF",
+                data=plot_generated_pdf,
+                file_name=file_name[0],
+                mime="application/pdf",
+                use_container_width=True
+            )
+        with donwload_slot_r:
+            st.download_button(
+                label="Baixar Gráfico JPG",
+                data=plot_generated_jpg,
+                file_name=file_name[1],
+                mime="image/jpeg",
+                use_container_width=True
+            )
