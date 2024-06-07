@@ -12,16 +12,16 @@ from streamlit_extras.switch_page_button import switch_page
 # CONFIGURAÇÕES
 
 # CSS PARA ESCONDER COMPONENTES INÚTEIS DA PÁGINA STREAMLIT
-# hide_st_styles = """
-# <style>
-# #MainMenu {visibility: hidden;}
-# footer {visibility: hidden;}
-# header {visibility: hidden;}
-# [data-testid="collapsedControl"] {display: none;}
-# </style>
-#"""
+hide_st_styles = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+[data-testid="collapsedControl"] {display: none;}
+</style>
+"""
 
-hide_st_styles = ""
+# hide_st_styles = ""
 
 # PÁGINAS A ESCONDER NA SIDEBAR
 pages_to_hide = ["Home", "Estatisticas"]
