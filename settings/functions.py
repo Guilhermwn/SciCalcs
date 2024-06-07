@@ -292,3 +292,17 @@ def inv_r_combination(gain: int, precision: int):
     # Ordenar os resistores pela soma dos seus valores, como uma forma de organização
     resistors.sort(key=lambda x: x[0] + x[1])
     return resistors
+
+
+@st.cache_data
+def convert_to_csv(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv(index=True).encode('utf-8')
+
+@st.cache_data
+def convert_to_excel(df):
+    buffer = BytesIO()
+    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        # Write each dataframe to a different worksheet.
+        df.to_excel(writer, sheet_name='Sheet1', index=True)
+    return buffer

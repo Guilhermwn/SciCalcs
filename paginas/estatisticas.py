@@ -30,11 +30,15 @@ st.header("Estatísticas")
 
 option = st.selectbox("Label",
                                 options=["Incertezas Associadas",
-                                         "Geração de Gráficos"],
+                                         "Geração de Gráficos",
+                                         "Planilha Incertezas"],
                                 placeholder="Escolha o que fazer:",
                                 index=0, 
                                 label_visibility="collapsed")
 st.divider()
+
+# =====================================================
+# PÁGINA CÁLCULO DE INCERTEZAS
 
 if option == "Incertezas Associadas":
     
@@ -330,6 +334,7 @@ if option == "Geração de Gráficos":
         plt.savefig(plot_generated_pdf, dpi=300,format='pdf')
         plt.savefig(plot_generated_jpg, dpi=300,format='jpg')
 
+        # BOTÕES DE DOWNLOAD DO GRÁFICO GERADO
         donwload_slot_l, donwload_slot_r = st.columns(2)
         with donwload_slot_l:
             st.download_button(
@@ -345,5 +350,77 @@ if option == "Geração de Gráficos":
                 data=plot_generated_jpg,
                 file_name=file_name[1],
                 mime="image/jpeg",
+                use_container_width=True
+            )
+
+if option == "Planilha Incertezas":
+    # =====================================================
+    # CONSTANTES
+    medias = list()
+    desv_pad = list()
+    incer_a = list()
+    incer_c = list()
+
+    # =====================================================
+    # PÁGINA 
+    
+    # TÍTULO DA PÁGINA
+    st.title("Incertezas calculadas a partir de um arquivo")
+    
+    # SEÇÃO DE UPLOAD DO ARQUIVO
+    uploaded_file = st.file_uploader("Escolha um arquivo", type=["xlsx", "csv"])
+    bytes_data  = uploaded_file
+    
+    if bytes_data is not None:
+        data_name = uploaded_file.name
+        data_name_split = data_name.split('.')
+        
+        if "xlsx" in data_name:
+            df = pd.read_excel(bytes_data)
+        elif "csv" in data_name:
+            df = pd.read_csv(bytes_data)
+        
+        colunas = df.columns
+        df.set_index(colunas[0], inplace=True)
+        df.index.name = 'Medidas'
+
+        incer_b = st.number_input('Insira a incerteza instrumental',placeholder='Incerteza Instrumental/Incerteza B')
+        
+        st.header('Planilha Inserida')
+        st.dataframe(df, use_container_width=True)
+
+        for col in colunas[1:]:
+            medidas = df[col].tolist()
+            medias.append(media(medidas))
+            desv_pad.append(desvio_padrao(medidas))
+            incer_a.append(incertezaA(medidas))
+            incer_c.append(incerteza_combinada(medidas, incer_b))
+        
+        df.loc['Média'] = medias
+        df.loc['Desvio Padrão'] = desv_pad
+        df.loc['Incerteza A'] = incer_a
+        df.loc['Incerteza B'] = incer_b
+        df.loc['Incerteza C'] = incer_c
+
+        st.header('Planilha calculada')
+        with st.container(border=True):
+            st.dataframe(df, use_container_width=True)
+            
+            # OPÇÃO DE BAIXAR A PLANILHA COMO CSV
+            csv = convert_to_csv(df)
+            download1 = st.download_button(
+                label="Baixar como CSV",
+                data=csv,
+                file_name=f'{data_name_split[0]}.csv',
+                mime='text/csv',
+                use_container_width=True
+            )
+            # OPÇÃO DE BAIXAR A PLANILHA COMO EXCEL
+            excel = convert_to_excel(df)
+            download1 = st.download_button(
+                label="Baixar como EXCEL",
+                data=excel,
+                file_name=f'{data_name_split[0]}.xlsx',
+                mime='application/vnd.ms-excel',
                 use_container_width=True
             )
