@@ -5,12 +5,12 @@
 import re
 import os
 import schemdraw
+import pandas as pd
 from io import BytesIO
 from pathlib import Path
 import matplotlib.pyplot as plt
 import schemdraw.elements as elm
 from decimal import Decimal, getcontext
-import pandas as pd
 
 # IMPORTAÇÕES STREAMLIT
 import streamlit as st
@@ -293,12 +293,16 @@ def inv_r_combination(gain: int, precision: int):
     resistors.sort(key=lambda x: x[0] + x[1])
     return resistors
 
+# ------------------------------------------------
+# FUNÇÕES PANDAS
 
+# CONVERTE UM DATAFRAME INSERIDO EM UM ARQUIVO CSV
 @st.cache_data
 def convert_to_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv(index=True).encode('utf-8')
 
+# CONVERTE UM DATAFRAME INSERIDO EM UM ARQUIVO EXCEL
 @st.cache_data
 def convert_to_excel(df):
     buffer = BytesIO()

@@ -4,3 +4,4 @@ st_pages
 streamlit_option_menu
 schemdraw
 xlsxwriter
+openpyxl
