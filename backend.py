@@ -1,11 +1,19 @@
+# ======================================
+# IMPORTS
 from nicegui import ui
-from frontend import *
+
+# SciCalcs Internal Modules
+from settings.mainpages import home_layout, eletrica_layout, estatistica_layout, not_found_404
+from settings.eletrica_sub_pages import ganho_amplificador
+from settings.estatistica_sub_pages import incertezas
+from settings.defining_functions import clear_text
+
+# ======================================
+# ROUTES HANDLING
 
 @ui.page('/')
 async def home_page():
-    # home_layout()
-    ui.button('ELÉTRICA', on_click=lambda: ui.navigate.to('/eletrica'))
-    ui.button('ESTATÍSTICA', on_click=lambda: ui.navigate.to('/estatistica'))
+    home_layout()
 
 @ui.page('/{category}')
 async def category_selector(category):
@@ -19,8 +27,15 @@ async def category_selector(category):
 @ui.page('/{category}/{subcategory}')
 async def subcatery_calculator(category, subcategory):
     if category == 'eletrica':
-        if subcategory == 'Ganho de amplificador'.casefold():
+        if subcategory == clear_text('Ganho de amplificador'):
             ganho_amplificador()
+        else:
+            not_found_404()
+    if category == 'estatistica':
+        if subcategory == clear_text('Incertezas'):
+            incertezas()
+        else:
+            not_found_404()
         
 
-ui.run()
+ui.run(dark=False, host='192.168.1.10')

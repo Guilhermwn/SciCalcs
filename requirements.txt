@@ -5,3 +5,4 @@ streamlit_option_menu
 schemdraw
 xlsxwriter
 openpyxl
+unidecode
