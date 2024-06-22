@@ -38,4 +38,5 @@ async def subcatery_calculator(category, subcategory):
             not_found_404()
         
 
-ui.run(dark=False, host='192.168.1.10')
+ui.run()
+# ui.run(dark=False, host='192.168.1.10')

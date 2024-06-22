@@ -3,8 +3,10 @@
 *.pyo
 *.pyd
 *.ps1
+*.ipynb
 package.json
 package-lock.json
+
 
 # Ignorara pastas geradas
 __pycache__/

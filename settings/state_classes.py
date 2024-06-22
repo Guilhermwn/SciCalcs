@@ -40,8 +40,10 @@ Notes:
 # ======================================
 # IMPORTS
 from nicegui import events ,ui
-import re
+from typing import Optional
+from pathlib import Path
 import pandas as pd
+import re
 import io
 
 # ======================================
@@ -302,6 +304,11 @@ class IncertezasManager:
         self.sum = sum(self.medidas)
         self.incerteza_b = float(incerteza_b)
     
+    def set_incerteza_b(self, value: float):
+        if value == '':
+            value = 0
+        self.incerteza_b = value
+    
     def media(self):
         """
         Calculate the mean of measurements.
@@ -369,11 +376,11 @@ class IncertezasManager:
         self._incertezaA = self.incertezaA()
         self._incerteza_combinada = ( (self._incertezaA ** 2) + (self.incerteza_b ** 2) ) ** 0.5
         return self._incerteza_combinada
-    def calculate_incertezas(self, incerteza_b: float = 0):
+    def calculate_incertezas(self):
         """
         Calculates all the uncertainties
         """
-        self.incerteza_combinada(incerteza_b=incerteza_b)
+        self.incerteza_combinada(incerteza_b=self.incerteza_b)
 
 
 # ======================================
@@ -383,32 +390,69 @@ class IncertezasManager:
 class UploadManager(IncertezasManager):
     def __init__(self):
         super().__init__()
-        self.dataframe: pd.DataFrame = None
-        self.df_cols: list[str] = []
+        self.file_name: str = ""
+        
+        self.original_dataframe: Optional[pd.DataFrame] = None
+        self.original_df_cols: list[str] = []
+
+        self.new_dataframe: Optional[pd.DataFrame] = None
+        self.new_df_cols: list[str] = []
+
         self.list_media: list[float] = []
         self.list_desv_pad: list[float] = []
         self.list_inc_a: list[float] = []
         self.list_inc_c: list[float] = []
-
+        
     def dataframer(self, event: events.UploadEventArguments):
-                """Generates and updates the Aggrid"""
-                if ".csv" in event.name: 
-                    with io.StringIO(event.content.read().decode()) as f:
-                        self.dataframe = pd.read_csv(f)
-                elif ".xlsx" in event.name:
-                    with io.BytesIO(event.content.read()) as f:
-                        self.dataframe = pd.read_excel(f)
-    def incertezas_lists(self):
-        self.df_cols = self.dataframe.columns
+        """Generates and updates the Aggrid"""
 
-        for col in self.df_cols[1:]:
-            medidas = self.dataframe[col].tolist()
+        self.file_name = event.name
+        
+        if ".csv" in event.name: 
+            with io.StringIO(event.content.read().decode()) as f:
+                self.original_dataframe = pd.read_csv(f)
+            self.original_df_cols = self.original_dataframe.columns.tolist()
+        
+        elif ".xlsx" in event.name:
+            with io.BytesIO(event.content.read()) as f:
+                self.original_dataframe = pd.read_excel(f)
+            self.original_df_cols = self.original_dataframe.columns.tolist()
+        
+        else:
+            raise ValueError("Unsupported file format")
+    
+
+    def incertezas_lists(self):
+        self.list_media = []
+        self.list_desv_pad = []
+        self.list_inc_a = []
+        self.list_inc_c = []
+
+        for col in self.original_df_cols[1:]:
+            medidas = self.original_dataframe[col].tolist()
             medidas = str(medidas)
 
-            self.set_values(medidas)
+            self.set_values(medidas, incerteza_b=self.incerteza_b)
             self.calculate_incertezas()
+            print(f"Incerteza B: {self.incerteza_b}")
 
             self.list_media.append(float(f'{self._media:.6f}'))
             self.list_desv_pad.append(float(f'{self._desvio_padrao:.6f}'))
             self.list_inc_a.append(float(f'{self._incertezaA:.6f}'))
             self.list_inc_c.append(float(f'{self._incerteza_combinada:.6f}'))
+
+    def incerteza_dataframe(self):
+        # new dataframe becomes a copy of the original/uploaded dataframe
+        self.new_dataframe = self.original_dataframe.copy()
+        self.new_df_cols = self.new_dataframe.columns
+
+        self.new_dataframe.set_index(self.new_df_cols[0], inplace=True)
+        self.incertezas_lists()
+        
+        self.new_dataframe.loc['Média'] = self.list_media
+        self.new_dataframe.loc['Desvio Padrão'] = self.list_desv_pad
+        self.new_dataframe.loc['Incerteza A'] = self.list_inc_a
+        self.new_dataframe.loc['Incerteza B'] = self.incerteza_b
+        self.new_dataframe.loc['Incerteza C'] = self.list_inc_c
+        
+        self.new_dataframe.reset_index(inplace=True)

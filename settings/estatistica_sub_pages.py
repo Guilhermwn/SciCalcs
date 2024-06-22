@@ -82,39 +82,33 @@ def incertezas():
             """)
 
             def uihandler(**elements):
-                manager = elements['manager']
-                old_table = elements['old_table']
-                old_label = elements['old_label']
-                new_table = elements['new_table']
-                new_label = elements['new_label']
-                button = elements['button']
-                result_div = elements['result_div']
+                manager: UploadManager = elements['manager']
+                old_table: ui.aggrid = elements['old_table']
+                old_label: ui.label = elements['old_label']
+                new_table: ui.aggrid = elements['new_table']
+                new_label: ui.label = elements['new_label']
+                button: ui.button = elements['button']
+                result_div: ui.element = elements['result_div']
 
-                button.disable()
-                old_label.set_text('Conteúdo original')
-                new_label.set_text('Novo Conteúdo')
+                # button.disable()
+                old_label.set_text(f'Conteúdo original de {manager.file_name}')
+                new_label.set_text(f'Novo Conteúdo de {manager.file_name}')
 
-                df = manager.dataframe
+                df = manager.original_dataframe
                 old_data = df.to_dict(orient='records')
                 old_columns = [{'headerName': col, 'suppressMovable': True, 'field': col} for col in df.columns]
 
                 old_table.options['rowData'] = old_data
                 old_table.options['columnDefs'] = old_columns
-                if df.shape[0] <= 8:
-                    old_table.options['domLayout'] = 'autoHeight'
                 old_table.update()
 
-                manager.incertezas_lists()
-                colunas = manager.df_cols
-                df.set_index(colunas[0], inplace=True)
-                df.index.name = 'Medidas'
-                df.loc['Média'] = manager.list_media
-                df.loc['Desvio Padrão'] = manager.list_desv_pad
-                df.loc['Incerteza A'] = manager.list_inc_a
-                df.loc['Incerteza B'] = manager.incerteza_b
-                df.loc['Incerteza C'] = manager.list_inc_a
-                df_tail = df.tail()
-                df_tail.reset_index(inplace=True)
+                # manager.incertezas_lists()
+                manager.incerteza_dataframe()
+
+                new_df = manager.new_dataframe
+
+                df_tail = new_df.tail()
+
                 new_data = df_tail.to_dict(orient='records')
                 new_columns = [{'headerName': col, 'suppressMovable': True, 'field': col} for col in df_tail.columns]
                 new_table.options['rowData'] = new_data
@@ -123,29 +117,16 @@ def incertezas():
                 new_table.update()
                 visibility_management(True, old_table, result_div)
 
-            def reset_ui_elements():
-                og_label.set_text('')
-                og_table.options['rowData'] = []
-                og_table.options['columnDefs'] = []
-                og_table.update()
-
-                new_label.set_text('')
-                new_table.options['rowData'] = []
-                new_table.options['columnDefs'] = []
-                new_table.update()
-
-                visibility_management(False, og_table, result)
-
             with ui.element('div').classes('w-full grid justify-items-center'):
                 file_uploaded = ui.upload(label="Insira o arquivo (.CSV ou . XLSX)",
-                                on_upload=lambda e: (upload_manager.dataframer(e), reset_ui_elements(), visibility_management(True, calcular), calcular.enable()),
+                                on_upload=lambda e: (upload_manager.dataframer(e), visibility_management(True, calcular, inc_b_input), calcular.enable()),
                                 on_rejected=lambda: ui.notify('Formato não reconhecido, tente novamente!'),
                                 max_files=1,
                                 max_file_size=5_000_000,
                                 auto_upload=True
                                 ).props('accept=".csv, .xlsx" flat bordered').classes('w-full')
 
-
+            inc_b_input = ui.input(label='Insira o valor da Incerteza B', placeholder='0.05', on_change=lambda e: upload_manager.set_incerteza_b(e.value))
             calcular = ui.button("Calcular", on_click=lambda:uihandler(
                 manager = upload_manager, 
                 old_table = og_table, 
@@ -153,10 +134,11 @@ def incertezas():
                 new_table = new_table,
                 new_label = new_label,
                 button = calcular,
-                result_div = result
+                result_div = result,
+                inc_b = inc_b_input
                 ))
             calcular.classes('w-full')
-            visibility_management(False, calcular)
+            visibility_management(False, calcular, inc_b_input)
 
             with ui.element('div') as container:
                 container.classes('w-full my-10')
@@ -181,10 +163,10 @@ def incertezas():
                     with ui.row().classes('flex justify-around'):
                         
                         download_as_csv = ui.button('Download .CSV',
-                                                    on_click=lambda: ui.download(src=convert_to_csv(upload_manager.dataframe), 
+                                                    on_click=lambda: ui.download(src=convert_to_csv(upload_manager.new_dataframe), 
                                                                                  filename="output.csv")).classes('w-[45%]')
                         download_as_excel = ui.button('Download .XLSX',
-                                                      on_click=lambda: ui.download(src=convert_to_excel(upload_manager.dataframe),
+                                                      on_click=lambda: ui.download(src=convert_to_excel(upload_manager.new_dataframe),
                                                                                    filename='output.xlsx')).classes('w-[45%]')
 
                     
