@@ -1,0 +1,20 @@
+# Ignorar arquivos python compilados
+*.pyc
+*.pyo
+*.pyd
+*.ps1
+*.ipynb
+*.xlsx
+*.csv
+package.json
+package-lock.json
+
+
+# Ignorara pastas geradas
+__pycache__/
+pycache/
+.env/
+node_modules/
+tailwindcss/node_modules/
+colors/
+.vercel
