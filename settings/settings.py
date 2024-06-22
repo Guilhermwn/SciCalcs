@@ -1,16 +1,17 @@
+# ------------------------------------------------
 # IMPORTAÇÕES
 
 # Importação Streamlit
 import streamlit as st
-from streamlit_extras.switch_page_button import switch_page
-from st_pages import show_pages_from_config, hide_pages
+import streamlit.components.v1 as components
 from streamlit_option_menu import option_menu
-# Importação Streamlit
+from st_pages import show_pages_from_config, hide_pages
+from streamlit_extras.switch_page_button import switch_page
 
-# Importação de funções internas
-import settings.functions as func
-
+# ------------------------------------------------
 # CONFIGURAÇÕES
+
+# CSS PARA ESCONDER COMPONENTES INÚTEIS DA PÁGINA STREAMLIT
 hide_st_styles = """
 <style>
 #MainMenu {visibility: hidden;}
@@ -22,5 +23,7 @@ header {visibility: hidden;}
 
 # hide_st_styles = ""
 
+# PÁGINAS A ESCONDER NA SIDEBAR
 pages_to_hide = ["Home", "Estatisticas"]
+
 
