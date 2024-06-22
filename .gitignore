@@ -4,6 +4,8 @@
 *.pyd
 *.ps1
 *.ipynb
+*.xlsx
+*.csv
 package.json
 package-lock.json
 

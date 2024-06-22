@@ -173,4 +173,4 @@ def incertezas():
 
     tabber = TabsCreator(calculadoras)
     tabber.create_tabs_header()
-    tabber.create_tabs_panel(tab2, tab1)
+    tabber.create_tabs_panel(tab1, tab2)
