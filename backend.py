@@ -1,7 +1,7 @@
 # ======================================
 # IMPORTS
 # ======================================
-from nicegui import ui, app
+from nicegui import app, ui
 from fastapi import FastAPI
 import os
 
@@ -50,8 +50,7 @@ async def subcatery_calculator(category, subcategory):
         
 
 
-# ui.run(reload='FLY_ALLOC_ID' not in os.environ)
 ui.run_with(app=fast)
+# ui.run(reload='FLY_ALLOC_ID' not in os.environ)
 
 # ui.run(host='192.168.1.10')
-
