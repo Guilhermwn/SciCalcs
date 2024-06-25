@@ -2,6 +2,7 @@
 # IMPORTS
 # ======================================
 from nicegui import ui, app
+from fastapi import FastAPI
 
 # SciCalcs Internal Modules
 from settings.mainpages import home_layout, eletrica_layout, estatistica_layout, not_found_404
@@ -13,6 +14,7 @@ from settings.defining_functions import clear_text
 # ROUTES HANDLING
 # ======================================
 
+fast = FastAPI()
 app.add_static_files('/img', 'img')
 
 
@@ -46,6 +48,8 @@ async def subcatery_calculator(category, subcategory):
         #     not_found_404()
         
 
-ui.run(reload=False)
+ui.run_with(app=fast)
+
+# ui.run(reload=False)
 # ui.run(host='192.168.1.10')
 
