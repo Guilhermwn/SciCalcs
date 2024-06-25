@@ -6,6 +6,7 @@
 *.ipynb
 *.xlsx
 *.csv
+Dockerfile
 package.json
 package-lock.json
 

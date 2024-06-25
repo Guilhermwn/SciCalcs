@@ -3,6 +3,7 @@
 # ======================================
 from nicegui import ui, app
 from fastapi import FastAPI
+import os
 
 # SciCalcs Internal Modules
 from settings.mainpages import home_layout, eletrica_layout, estatistica_layout, not_found_404
@@ -48,8 +49,9 @@ async def subcatery_calculator(category, subcategory):
         #     not_found_404()
         
 
+
+# ui.run(reload='FLY_ALLOC_ID' not in os.environ)
 ui.run_with(app=fast)
 
-# ui.run(reload=False)
 # ui.run(host='192.168.1.10')
 
