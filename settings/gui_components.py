@@ -25,6 +25,7 @@ This module provides functionalities for structuring and styling components that
 
 # ======================================
 # IMPORTS 
+# ======================================
 
 from nicegui import ui
 from pathlib import Path
@@ -32,6 +33,7 @@ from pathlib import Path
 
 # ======================================
 # PAGE TITLE UTILITY
+# ======================================
 
 def page_title(title: str):
     """
@@ -52,6 +54,7 @@ def page_title(title: str):
 
 # ======================================    
 # MAIN HEADER LAYOUT
+# ======================================    
 
 def header_layout():
     """
@@ -68,6 +71,7 @@ def header_layout():
 
 # ======================================
 # GENERAL USAGE CARD
+# ======================================
 
 def cards(title:str, image:Path, target:str):
     """
@@ -95,7 +99,9 @@ def cards(title:str, image:Path, target:str):
 
 
 # ======================================
-# TABS GENERATOR
+# CLASS TABS GENERATOR
+# ======================================
+
 class TabsCreator:
     """
     Helper class for creating tabs with headers and panels using nicegui ui module.
@@ -154,3 +160,39 @@ class TabsCreator:
             for i, func in zip(self.tabs_iter, ui_functions):
                 with ui.tab_panel(i):
                     func()
+
+class GridManager:
+    def __init__(self):
+        self.columns = [
+            {'field': 'name', 'editable': True, 'sortable': True},
+            {'field': 'age', 'editable': True},
+            {'field': 'id'},
+        ]
+        self.rows = [
+            {'id': 0, 'name': 'Alice', 'age': 18},
+            {'id': 1, 'name': 'Bob', 'age': 21},
+            {'id': 2, 'name': 'Carol', 'age': 20},
+        ]
+        self.aggrid = ui.aggrid({
+            'columnDefs': self.columns,
+            'rowData': self.rows,
+            'rowSelection': 'multiple',
+            'stopEditingWhenCellsLoseFocus': True,
+        }).on('cellValueChanged', self.handle_cell_value_change)
+
+    def add_row(self):
+        new_id = max((dx['id'] for dx in self.rows), default=-1) + 1
+        self.rows.append({'id': new_id, 'name': 'New name', 'age': None})
+        ui.notify(f'Added row with ID {new_id}')
+        self.aggrid.update()
+
+    def handle_cell_value_change(self, e):
+        new_row = e.args['data']
+        ui.notify(f'Updated row to: {e.args["data"]}')
+        self.rows[:] = [row | new_row if row['id'] == new_row['id'] else row for row in self.rows]
+
+    async def delete_selected(self):
+        selected_id = [row['id'] for row in await self.aggrid.get_selected_rows()]
+        self.rows[:] = [row for row in self.rows if row['id'] not in selected_id]
+        ui.notify(f'Deleted row with ID {selected_id}')
+        self.aggrid.update()

@@ -39,15 +39,20 @@ Notes:
 
 # ======================================
 # IMPORTS
-from nicegui import events ,ui
+# ======================================
+
+import matplotlib.pyplot as plt
+from nicegui import events ,ui, elements
 from typing import Optional
 from pathlib import Path
 import pandas as pd
+import base64
 import re
 import io
 
 # ======================================
 # CLASSES
+# ======================================
 
 # SUBCATEGORYS > GANHO AMPLIFICADOR
 # ADMINISTRATE THE STATE OF THE VARIABLES USED IN THE CALCULATIONS OF AMPLIFIER'S GAIN
@@ -103,7 +108,7 @@ class ResistorState:
         self.r2_unit = 'ohms'
         self.ganho = 0
 
-    def set_r1_value(self, value, ui_label: ui.label):
+    def set_r1_value(self, value: int, ui_label: ui.label):
         """
         Set the value of resistor R1 and update the UI label.
 
@@ -118,7 +123,7 @@ class ResistorState:
         self.ui_label = ui_label
         self.calculate_ganho(self.ui_label)
 
-    def set_r1_unit(self, unit, ui_label: ui.label):
+    def set_r1_unit(self, unit: str, ui_label: ui.label):
         """
         Set the unit of resistor R1 and update the UI label.
 
@@ -133,7 +138,7 @@ class ResistorState:
         self.ui_label = ui_label
         self.calculate_ganho(self.ui_label)
 
-    def set_r2_value(self, value, ui_label: ui.label):
+    def set_r2_value(self, value: int, ui_label: ui.label):
         """
         Set the value of resistor R2 and update the UI label.
 
@@ -148,7 +153,7 @@ class ResistorState:
         self.ui_label = ui_label
         self.calculate_ganho(self.ui_label)
 
-    def set_r2_unit(self, unit, ui_label: ui.label):
+    def set_r2_unit(self, unit: str, ui_label: ui.label):
         """
         Set the unit of resistor R2 and update the UI label.
 
@@ -183,7 +188,7 @@ class ResistorState:
             self.ganho = f"Erro: {str(e)}"
         ui_label.set_text(f"Ganho: {self.ganho:.2f}")
 
-    def convert_to_ohms(self, value, unit):
+    def convert_to_ohms(self, value: int, unit: str):
         """
         Convert resistor value to ohms based on specified unit.
 
@@ -210,7 +215,6 @@ class ResistorState:
 
 # SUBCATEGORYS > INCERTEZA
 # HANDLES THE CALCULATIONS AND VARIABLE STATE OF THE UNCERTAINTYS
-
 class IncertezasManager:
     """
     Manage calculations and variable states related to uncertainties in measurements.
@@ -376,6 +380,7 @@ class IncertezasManager:
         self._incertezaA = self.incertezaA()
         self._incerteza_combinada = ( (self._incertezaA ** 2) + (self.incerteza_b ** 2) ) ** 0.5
         return self._incerteza_combinada
+    
     def calculate_incertezas(self):
         """
         Calculates all the uncertainties
@@ -420,7 +425,6 @@ class UploadManager(IncertezasManager):
         
         else:
             raise ValueError("Unsupported file format")
-    
 
     def incertezas_lists(self):
         self.list_media = []
@@ -456,3 +460,148 @@ class UploadManager(IncertezasManager):
         self.new_dataframe.loc['Incerteza C'] = self.list_inc_c
         
         self.new_dataframe.reset_index(inplace=True)
+
+
+# ======================================
+
+class PyplotManager:
+    def __init__(self):
+        self.graph_options = ['Linha', 'Dispersão']
+        self.color_map = {
+            "Padrão": "#1f77b4",
+            "Laranja": "#ff7f0e",
+            "Verde": "#2ca02c",
+            "Vermelho": "#d62728",
+            "Roxo": "#9467bd",
+            "Marrom": "#8c564b",
+            "Rosa": "#e377c2" ,
+            "Cinza": "#7f7f7f",
+            "Verde Claro": "#bcbd22",
+            "Azul Claro": "#17becf",
+        }
+        self.line_style_map = {
+            "Sólido": "-",
+            "Tracejada": "--",
+            "Tracejada + Ponto": "-.",
+            "Pontuada": ":"
+        }
+        self.markers_style_map = {
+            "Padrão": "o",
+            "Ponto": ".",
+            "Triângulo": "^",
+            "Tri": "2",
+            "Quadrado" : "s",
+            "Mais": "P",
+            "Estrela": "*",
+        }
+
+        # Main Plot
+        self.plot = None
+        self.ax = None
+
+        # Axes settings
+        self.x_axes: list[float] = list()
+        self.y_axes: list[float] = list()
+
+        # Styling settings
+        self.graph_type: str = self.graph_options[0]
+        self.graph_title: str = str()
+        self.x_label: str = str()
+        self.y_label: str = str()
+        self.data_color: str = list(self.color_map.keys())[0]
+        self.line_style: str = list(self.line_style_map.keys())[0]
+        self.markers_style: str = list(self.markers_style_map.keys())[0]
+
+        self.pdf_plot = None
+        self.jpg_plot = None
+        self.file_name = None
+        self.plot_image: str = None
+        
+    def set_pyplot(self, plot: ui.pyplot):
+        self.plot = plot
+        self.ax = self.plot.fig.add_subplot()
+
+    def set_title(self, title: str):
+        self.graph_title = title
+        
+    def set_graph_type(self, graph_type: str):
+        self.graph_type = graph_type
+
+    def set_data_color(self, data_color: str):
+        self.data_color = data_color
+
+    def set_x_label(self, x_label: str):
+        self.x_label = x_label
+    
+    def set_y_label(self, y_label: str):
+        self.y_label = y_label
+
+    def set_line_style(self, line_style: str):
+        self.line_style = line_style
+
+    def set_marker_style(self, marker_style: str):
+        self.markers_style = marker_style
+
+    def set_x_axes(self, values: str):
+        num_pattern = re.compile(r'[+-]?(?:\d+\.\d+|\d+\.\d*|\.\d+|\d+)')
+        finder = re.findall(num_pattern, values)
+        self.x_axes = list(map(float, finder))
+    
+    def set_y_axes(self, values: str):
+        num_pattern = re.compile(r'[+-]?(?:\d+\.\d+|\d+\.\d*|\.\d+|\d+)')
+        finder = re.findall(num_pattern, values)
+        self.y_axes = list(map(float, finder))
+
+    def update_plot(self, image_component: ui.image):
+        
+        with self.plot:
+            self.ax.clear()
+            
+            if self.graph_type == self.graph_options[0]:
+                self.ax.plot(
+                    self.x_axes, 
+                    self.y_axes, 
+                    color = self.color_map[self.data_color],
+                    linestyle = self.line_style_map[self.line_style]
+                    )
+                
+            elif self.graph_type == self.graph_options[1]:
+                self.ax.scatter(
+                    self.x_axes, 
+                    self.y_axes,
+                    color = self.color_map[self.data_color],
+                    marker = self.markers_style_map[self.markers_style]
+                    )
+            
+            self.ax.set_xlabel(self.x_label, fontsize=14)
+            self.ax.set_ylabel(self.y_label, fontsize=14)
+            self.ax.set_title(self.graph_title, fontsize=14)
+
+        ui.update(self.plot)
+        self.download_plot()
+        image_component.set_source(self.plot_image)
+        # image_component.force_reload()
+
+    def download_plot(self):
+        buf_jpg = io.BytesIO()
+        buf_pdf = io.BytesIO()
+
+        # GERAÇÃO DO NOME DO ARQUIVO
+        self.file_name = f"{self.graph_title or 'graph_scicalcs'}"
+
+        self.plot.fig.savefig(buf_jpg, dpi=500, format='jpg')
+        buf_jpg.seek(0)
+        self.jpg_plot = buf_jpg.read()
+        buf_jpg.close()
+
+        self.plot.fig.savefig(buf_pdf, dpi=500, format='pdf')
+        buf_pdf.seek(0)
+        self.pdf_plot = buf_pdf.read()
+        buf_pdf.close()
+
+        self.plot_image = f"data:image/jpeg;base64,{base64.b64encode(self.jpg_plot).decode('utf-8')}"
+        
+
+
+
+        

@@ -1,23 +1,33 @@
 # ======================================
 # IMPORTS
+# ======================================
 
-from nicegui import ui, app
-import pandas as pd
+from nicegui import ui, events
+import numpy as np
+# import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
+import base64
 
 # SciCalcs internal files
 from .gui_components import page_title, header_layout, TabsCreator
-from .state_classes import IncertezasManager, UploadManager
+from .state_classes import IncertezasManager, UploadManager, PyplotManager
 from .defining_functions import visibility_management, convert_to_csv, convert_to_excel
 
 # ======================================
-# SUBCATEGOY PAGES LAYOUT
+# SUBCATEGOY INCERTEZAS PAGE's LAYOUTS
+# ======================================
 
 def incertezas():
     page_title('Incertezas')
     calculadoras = ["Incertezas", "Planilha de Incertezas"]
     header_layout()
     
-    # TAB INCERTEZAS
+
+
+    # ======================================
+    # TAB 1 INCERTEZAS
+    # ======================================
+
     def tab1():
         # CONSTANTES
         incerteza = IncertezasManager()
@@ -70,7 +80,12 @@ def incertezas():
                         ui.markdown(titles[i])
                         label_hand[i].move(card)
     
-    # TAB INCERTEZAS THROUGH SPREADSHEETS
+
+
+    # ======================================
+    # TAB 2 INCERTEZAS THROUGH SPREADSHEETS
+    # ======================================
+
     def tab2():
         upload_manager = UploadManager()
         with ui.column().classes('w-full px-2 md:px-52'):
@@ -174,3 +189,141 @@ def incertezas():
     tabber = TabsCreator(calculadoras)
     tabber.create_tabs_header()
     tabber.create_tabs_panel(tab1, tab2)
+
+def graph_generation():
+    # ui.add_head_html('''
+    #     <script>
+    #     function emitSize() {
+    #         emitEvent('resize', {
+    #             width: document.body.offsetWidth,
+    #             height: document.body.offsetHeight,
+    #         });
+    #     }
+    #     window.onload = emitSize;
+    #     window.onresize = emitSize;
+    #     </script>
+    # ''')
+    
+    page_title('Geração de Gráfico')
+    header_layout()
+    with ui.column().classes('w-full px-2 md:px-52'):
+        
+        # CONSTANTES
+        pyplot_manager = PyplotManager()
+
+        ui.markdown("""
+        ## Geração de gráficos
+        Gere gráficos de **linha** ou de **dispersão** e customize ao seu gosto
+                    
+        ---
+        """)
+
+        def show_style():
+            if pyplot_manager.graph_type == pyplot_manager.graph_options[0]:
+                visibility_management(True, line_style)
+                visibility_management(False, marker_style)
+            elif pyplot_manager.graph_type == pyplot_manager.graph_options[1]:
+                visibility_management(True, marker_style)
+                visibility_management(False, line_style)
+        
+        # ======================================
+        # GRAPH SETTINGS FORM
+        # ======================================
+
+        # SELEÇÃO DO TIPO DE GRÁFICO
+        graph_type = ui.select(label='Escolha o tipo de gráfico', 
+                               value=pyplot_manager.graph_options[0],
+                               options=pyplot_manager.graph_options, 
+                               on_change=lambda e: (pyplot_manager.set_graph_type(e.value), show_style())
+                               ).classes('w-full')
+        
+        with ui.expansion('Dados', icon='analytics', value=True).classes('w-full'):
+            x_axes = ui.input(label='Eixo X', 
+                              on_change=lambda e: pyplot_manager.set_x_axes(e.value)
+                              ).classes('w-full')
+            
+            y_axes = ui.input(label='Eixo Y', 
+                              on_change=lambda e: pyplot_manager.set_y_axes(e.value)
+                              ).classes('w-full')
+        
+        with ui.expansion('Customização', icon='tune').classes('w-full'):
+
+            line_style = ui.select(label='Estilo da linha', 
+                                   options=list(pyplot_manager.line_style_map.keys()), 
+                                   value=list(pyplot_manager.line_style_map.keys())[0], 
+                                   on_change=lambda e: pyplot_manager.set_line_style(e.value)
+                                   ).classes('w-full')
+            
+            marker_style = ui.select(label='Estilo do marcador', 
+                                     options=list(pyplot_manager.markers_style_map.keys()), 
+                                     value=list(pyplot_manager.markers_style_map.keys())[0], 
+                                     on_change=lambda e: pyplot_manager.set_marker_style(e.value)
+                                     ).classes('w-full')
+            
+            visibility_management(False, marker_style)
+
+            graph_title = ui.input(label='Título do gráfico', 
+                                   on_change=lambda e: pyplot_manager.set_title(e.value)
+                                   ).classes('w-full')
+            
+            x_label = ui.input(label='Título do Eixo X', 
+                               on_change=lambda e: pyplot_manager.set_x_label(e.value)
+                               ).classes('w-full')
+            
+            y_label = ui.input(label='Título do Eixo Y', 
+                               on_change=lambda e: pyplot_manager.set_y_label(e.value)
+                               ).classes('w-full')
+            
+            data_color = ui.select(label='Cor dos dados', 
+                                   options=list(pyplot_manager.color_map.keys()), 
+                                   on_change=lambda e: pyplot_manager.set_data_color(e.value)
+                                   ).classes('w-full')
+        
+        
+        ui.button('Gerar', on_click=lambda: pyplot_manager.update_plot(plot_image)).classes('w-full')
+        
+        # ======================================
+        # GRAPH SETTINGS FORM
+        # ======================================
+       
+        ui.on('resize', lambda e: print(f'resize: {e.args}'))
+        
+        # ======================================
+        # GRAPH SHOW RESULT
+        # ======================================
+
+        # with ui.element('div').classes('w-full flex flex-col items-center bg-red-300'): 
+        # with ui.element('div').classes('flex flex-col items-center my-5 bg-green-500'):
+        with ui.element('div').classes('w-full my-5'):
+            with ui.pyplot(close=False) as plot:
+                # plot.style('max-width: 100%; max-height: 100%;')
+                visibility_management(False, plot)
+                pyplot_manager.set_pyplot(plot)
+                pyplot_manager.download_plot()
+            
+            
+            plot_image = ui.image(pyplot_manager.plot_image)
+                    
+        with ui.element('div').classes('w-full flex flex-col items-center'):     
+            with ui.row():
+                
+                ui.button('Baixar JPEG', 
+                            on_click=lambda: ui.download(
+                                filename=f'{pyplot_manager.file_name}.jpg', 
+                                src=pyplot_manager.jpg_plot, 
+                                media_type='image/jpeg'))
+                
+                ui.button('Baixar PDF', 
+                            on_click=lambda: ui.download(
+                                filename=f'{pyplot_manager.file_name}.pdf', 
+                                src=pyplot_manager.pdf_plot, 
+                                media_type='application/pdf'))
+
+        
+        # ======================================
+        # GRAPH SHOW RESULT
+        # ======================================
+
+
+
+                    

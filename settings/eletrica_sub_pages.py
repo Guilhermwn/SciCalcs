@@ -1,5 +1,6 @@
 # ======================================
 # IMPORTS
+# ======================================
 
 # NICEGUI IMPORTS 
 from nicegui import ui
@@ -12,6 +13,7 @@ from .defining_functions import amp_inversor_draw
 
 # ======================================
 # SUBPAGES FUNCTION DEFINITIONS
+# ======================================
 
 # ELÉTRICA'S PAGE "GANHO DE AMPLIFICADOR"
 def ganho_amplificador():
@@ -22,7 +24,8 @@ def ganho_amplificador():
     header_layout()
     
     # "Ganho de Amplificador" subpages
-    calculadoras = ['Inversor [R1,R2]', 'Inversor [G]', 'Não Inversor [R1, R2]', 'Não Inversor [G]']
+    # calculadoras = ['Inversor [R1,R2]', 'Inversor [G]', 'Não Inversor [R1, R2]', 'Não Inversor [G]']
+    calculadoras = ['Inversor [R1,R2]', ]
     
     def tab1():
         

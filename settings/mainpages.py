@@ -31,8 +31,9 @@ Functions
 
 # ======================================
 # IMPORTS
+# ======================================
 
-from nicegui import ui
+from nicegui import ui, app
 
 # SciCalcs internal files
 from .gui_components import  page_title, header_layout, cards
@@ -40,6 +41,9 @@ from .defining_functions import clear_text
 
 # ======================================
 # MAIN PAGE LAYOUT FUNCTIONS
+# ======================================
+
+app.add_static_files('img/', 'img')
 
 # HOME PAGE LAYOUT
 def home_layout():
@@ -63,6 +67,7 @@ def home_layout():
 
 # ======================================
 # ELETRICA PAGE LAYOUT
+# ======================================
 
 def eletrica_layout():
     """
@@ -77,7 +82,7 @@ def eletrica_layout():
     >>> eletrica_layout()
     """
     # Constantes
-    subcategorias = ['Ganho de amplificador', "resistores", "indutores"]
+    subcategorias = ['Ganho de amplificador', ]
 
     # página
     page_title('Elétrica')
@@ -91,6 +96,7 @@ def eletrica_layout():
 
 # ======================================
 # ESTATISTICA PAGE LAYOUT
+# ======================================
 
 def estatistica_layout():
     """
@@ -116,6 +122,7 @@ def estatistica_layout():
 
 # ======================================
 # NOT FOUND PAGE LAYOUT
+# ======================================
 
 def not_found_404():
     """

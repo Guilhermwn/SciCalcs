@@ -27,7 +27,9 @@ Examples
 """
 
 # ======================================
-# IMPORTS
+############### IMPORTS ################
+# ======================================
+
 import schemdraw 
 import schemdraw.elements as elm
 from io import BytesIO
@@ -35,9 +37,15 @@ import base64
 import unidecode as uni
 import pandas as pd
 
-# ======================================
-# FUNCTIONS
 
+# ======================================
+############# FUNCTIONS ################
+# ======================================
+
+
+# ======================================
+# CLEAR TEXT OF DECORATIONS AND UNCOMMON CARACTERS
+# ======================================
 def clear_text(text):
     """
     Convert the given text to lowercase, replace spaces with underscores, and remove any non-ASCII characters.
@@ -62,10 +70,11 @@ def clear_text(text):
     """
     return uni.unidecode(text.casefold().replace(" ", "_"))
 
-# ===========
-# GENERATOR FUNCTIONS
 
+# ======================================
 # INVERTER AMPLIFIER DRAWING GENERATOR
+# ======================================
+
 def amp_inversor_draw(line_color: str='white',bg_color: str='#0e1117'):
         """
         Generate a schematic drawing of an inverting amplifier and return it as a base64 encoded PNG image.
@@ -113,16 +122,28 @@ def amp_inversor_draw(line_color: str='white',bg_color: str='#0e1117'):
         return f"data:image/png;base64,{image_base64}"
 
 
+# ======================================
+# VISIBILITY MANAGEMENT OF NICEGUI FUNCTION
+# ======================================
+
 def visibility_management(state: bool ,*nicegui_elements):
     for element in nicegui_elements:
         element.set_visibility(state)
 
+
+# ======================================
 # CONVERTE UM DATAFRAME INSERIDO EM UM ARQUIVO CSV
+# ======================================
+
 def convert_to_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv(index=True).encode('utf-8')
 
+
+# ======================================
 # CONVERTE UM DATAFRAME INSERIDO EM UM ARQUIVO EXCEL
+# ======================================
+
 def convert_to_excel(df):
     buffer = BytesIO()
     with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
