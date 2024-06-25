@@ -438,7 +438,6 @@ class UploadManager(IncertezasManager):
 
             self.set_values(medidas, incerteza_b=self.incerteza_b)
             self.calculate_incertezas()
-            print(f"Incerteza B: {self.incerteza_b}")
 
             self.list_media.append(float(f'{self._media:.6f}'))
             self.list_desv_pad.append(float(f'{self._desvio_padrao:.6f}'))

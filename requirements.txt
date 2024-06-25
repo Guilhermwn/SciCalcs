@@ -1,4 +1,5 @@
-schemdraw
-xlsxwriter
-openpyxl
-unidecode
+nicegui==1.4.26
+schemdraw==0.19
+xlsxwriter==3.2.0
+openpyxl==3.1.2
+unidecode==1.3.8
