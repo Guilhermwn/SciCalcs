@@ -286,7 +286,7 @@ def graph_generation():
         # GRAPH SETTINGS FORM
         # ======================================
        
-        ui.on('resize', lambda e: print(f'resize: {e.args}'))
+        # ui.on('resize', lambda e: print(f'resize: {e.args}'))
         
         # ======================================
         # GRAPH SHOW RESULT

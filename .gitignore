@@ -6,6 +6,8 @@
 *.ipynb
 *.xlsx
 *.csv
+*.toml
+*.dockerignore
 Dockerfile
 compose.yml
 package.json
