@@ -1,30 +1,7 @@
-from settings.settings import *        
-from settings.functions import *
-from settings.classes import *
+import uvicorn
+from os import getenv
 
-# CONFIGURAÇÕES DA PÁGINA
-st.set_page_config(
-    page_title="SciCalcs Home",
-    initial_sidebar_state="collapsed",
-    layout="centered"
-)
-
-st.markdown(hide_st_styles, unsafe_allow_html=True)
-show_pages_from_config()
-# hide_pages(pages_to_hide)
-
-# CONTEÚDO DA PÁGINA
-
-menu = option_menu(
-    menu_title=None,
-    options=["Home"],
-    icons=["house-fill"],
-    orientation="horizontal",
-)
-
-
-st.header("Página Inicial")
-st.divider()
-
-pages_list = Detector("paginas").list_pages()
-grid_creator(pages_list)
+if __name__ == '__main__':
+    port = int(getenv('PORT', 8080))
+    uvicorn.run("backend:fast", host='0.0.0.0', port=port)
+    # uvicorn.run("main:app", host='0.0.0.0', port=port)
