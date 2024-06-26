@@ -7,3 +7,10 @@ fastapi==0.109.2
 uvicorn==0.25.0
 pandas==2.1.4
 matplotlib==3.8.2
+streamlit==1.35.0
+streamlit_extras==0.4.2
+st_pages==0.4.5
+streamlit_option_menu==0.3.12
+schemdraw==0.19
+xlsxwriter==3.2.0
+openpyxl==3.1.2
