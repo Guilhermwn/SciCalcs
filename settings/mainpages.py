@@ -136,5 +136,5 @@ def not_found_404():
     >>> not_found_404()
     """
     page_title('Indisponível')
-    ui.label("Not Found")
+    ui.markdown("# Go back to previous page")
 

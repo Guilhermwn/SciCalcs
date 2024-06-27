@@ -17,24 +17,38 @@ from .defining_functions import amp_inversor_draw
 
 # ELÉTRICA'S PAGE "GANHO DE AMPLIFICADOR"
 def ganho_amplificador():
+    # ======================================
+    # CONSTANTS
+    # ======================================
+
     # Page title
     page_title('Ganho de Amplificador')
+    calculadoras = ['Inversor [R1,R2]', ]
+
+    # ======================================
+    # LAYOUT
+    # ======================================
 
     # Base Header layout creation
     header_layout()
     
+    # ======================================
     # "Ganho de Amplificador" subpages
-    # calculadoras = ['Inversor [R1,R2]', 'Inversor [G]', 'Não Inversor [R1, R2]', 'Não Inversor [G]']
-    calculadoras = ['Inversor [R1,R2]', ]
-    
+    # ======================================
+
     def tab1():
-        
+        # ======================================
         # CONSTANTS
+        # ======================================
+
         state = ResistorState()
         unidades = ['ohms', 'kilohms', 'megaohms']
         global ganho_label
         
-        # PRESENTATION TEXT
+        # ======================================
+        # LAYOUT
+        # ======================================
+
         ui.markdown("""
         ## Amplificador Inversor
         Calcular o valor do ganho, de um circuito de **amplificador inversor** a partir do valor dos resistores 1 e 2 inseridos.
@@ -42,7 +56,7 @@ def ganho_amplificador():
         ---
         """)
 
-        # LAYOUT
+        # Row container for the amplifier page
         with ui.row().classes('w-full'):
             with ui.grid(columns=2).classes('w-full h-1/2 md:w-2/5'):
                 ui.number(label="Valor do Resistor 1", on_change=lambda e: state.set_r1_value(e.value, ganho_label))
