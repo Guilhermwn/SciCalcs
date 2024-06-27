@@ -1,29 +1,5 @@
 """
-Module for text processing and schematic drawing generation.
-
-This module provides functions for text cleaning and generating
-schematic drawings of inverting amplifiers.
-
-Functions
----------
-clear_text(text)
-    Convert the given text to lowercase, replace spaces with underscores,
-    and remove any non-ASCII characters.
-
-amp_inversor_draw(line_color='white', bg_color='#0e1117')
-    Generate a schematic drawing of an inverting amplifier and return it
-    as a base64 encoded PNG image.
-
-Examples
---------
->>> clear_text("Hello World!")
-'hello_world'
-
->>> clear_text("Café com leite")
-'cafe_com_leite'
-
->>> amp_inversor_draw(line_color='black', bg_color='white')
-'data:image/png;base64,...'
+Module for functions
 """
 
 # ======================================
@@ -127,6 +103,31 @@ def amp_inversor_draw(line_color: str='white',bg_color: str='#0e1117'):
 # ======================================
 
 def visibility_management(state: bool ,*nicegui_elements):
+    """
+    Manage the visibility state of multiple NiceGUI elements.
+
+    Parameters
+    ----------
+    state : bool
+        The desired visibility state. If `True`, elements will be visible.
+        If `False`, elements will be hidden.
+    *nicegui_elements : tuple
+        A variable number of NiceGUI elements whose visibility will be managed.
+
+    Returns
+    -------
+    None
+        This function does not return any value. It modifies the visibility state of the provided elements.
+
+    Examples
+    --------
+    >>> element1 = ui.label('Some Text')
+    >>> element2 = ui.input('Input some data')
+    >>> with ui.header() as element3:
+        ...
+    >>> visibility_management(False, element1, element2, element3)
+    Both element1 and element2 will be hidden.
+    """
     for element in nicegui_elements:
         element.set_visibility(state)
 
@@ -135,8 +136,31 @@ def visibility_management(state: bool ,*nicegui_elements):
 # CONVERTE UM DATAFRAME INSERIDO EM UM ARQUIVO CSV
 # ======================================
 
-def convert_to_csv(df):
-    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+def convert_to_csv(df: pd.DataFrame):
+    """
+    Convert a pandas DataFrame to a CSV format and encode it as UTF-8.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame to be converted to CSV.
+
+    Returns
+    -------
+    bytes
+        The CSV representation of the DataFrame, encoded as UTF-8.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    >>> csv_bytes = convert_to_csv(df)
+    >>> print(csv_bytes.decode('utf-8'))
+    ,A,B
+    0,1,4
+    1,2,5
+    2,3,6
+    """
     return df.to_csv(index=True).encode('utf-8')
 
 
@@ -144,7 +168,33 @@ def convert_to_csv(df):
 # CONVERTE UM DATAFRAME INSERIDO EM UM ARQUIVO EXCEL
 # ======================================
 
-def convert_to_excel(df):
+def convert_to_excel(df: pd.DataFrame):
+    """
+    Convert a pandas DataFrame to an Excel file and encode it as a base64 string.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame to be converted to an Excel file.
+
+    Returns
+    -------
+    str
+        A base64-encoded string of the Excel file content, suitable for use in data URLs.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    >>> excel_data_url = convert_to_excel(df)
+    >>> print(excel_data_url)
+    data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,...
+
+    Notes
+    -----
+    This function uses an in-memory buffer to store the Excel file content and encodes the content 
+    as a base64 string. The result is returned as a data URL.
+    """
     buffer = BytesIO()
     with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
         df.to_excel(writer, sheet_name='Sheet1', index=True)

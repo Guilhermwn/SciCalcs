@@ -22,3 +22,4 @@ node_modules/
 tailwindcss/node_modules/
 colors/
 .vercel
+tests

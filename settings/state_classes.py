@@ -551,7 +551,8 @@ class PyplotManager:
         finder = re.findall(num_pattern, values)
         self.y_axes = list(map(float, finder))
 
-    def update_plot(self, image_component: ui.image):
+    # def update_plot(self, image_component: Optional[ui.image]):
+    def update_plot(self):
         
         with self.plot:
             self.ax.clear()
@@ -576,10 +577,11 @@ class PyplotManager:
             self.ax.set_ylabel(self.y_label, fontsize=14)
             self.ax.set_title(self.graph_title, fontsize=14)
 
-        ui.update(self.plot)
+        self.plot._props['innerHTML'] = self.plot._props['innerHTML'].replace('<svg', '<svg style="width:100%;height:100%"')
+        self.plot.update()
         self.download_plot()
-        image_component.set_source(self.plot_image)
-        # image_component.force_reload()
+        # if image_component:
+        #     image_component.set_source(self.plot_image)
 
     def download_plot(self):
         buf_jpg = io.BytesIO()
